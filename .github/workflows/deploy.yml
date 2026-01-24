@@ -9,7 +9,6 @@ permissions:
   contents: read
   pages: write
   id-token: write
-  packages: read
 
 concurrency:
   group: 'pages'
@@ -45,7 +44,7 @@ jobs:
       - name: Setup npm for GitHub registry
         run: |
           echo "@k-l-lambda:registry=https://npm.pkg.github.com" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
 
       - name: Update package.json dependencies
         run: |
