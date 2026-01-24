@@ -9,11 +9,11 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: [
-			// Use lib entry point instead of browser (which requires Vue)
-			// Use exact match to not affect subpath imports
+			// Use browser bundle for music-widgets
+			// The lib/index.js doesn't exist, only the dist bundle does
 			{
-				find: /^@k-l-lambda\/music-widgets$/,
-				replacement: '@k-l-lambda/music-widgets/lib/index.js'
+				find: /^@k-l-lambda\/music-widgets(\/.*)?$/,
+				replacement: '@k-l-lambda/music-widgets/dist/musicWidgetsBrowser.common.js'
 			}
 		]
 	},
