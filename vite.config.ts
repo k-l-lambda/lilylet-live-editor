@@ -7,15 +7,6 @@ export default defineConfig({
 		exclude: ['verovio'],
 		include: ['@k-l-lambda/lilylet']
 	},
-	resolve: {
-		alias: []
-	},
-	build: {
-		commonjsOptions: {
-			include: [/music-widgets/, /node_modules/],
-			transformMixedEsModules: true
-		}
-	},
 	server: {
 		fs: {
 			allow: ['..']

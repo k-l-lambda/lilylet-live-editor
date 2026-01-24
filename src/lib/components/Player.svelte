@@ -55,10 +55,33 @@
 	let lastHighlightUpdate = 0;
 	const HIGHLIGHT_THROTTLE_MS = 50;
 
+	// Load music-widgets UMD bundle via script tag
+	async function loadMusicWidgets(): Promise<any> {
+		// Check if already loaded via UMD
+		if ((window as any).musicWidgetsBrowser) {
+			return (window as any).musicWidgetsBrowser;
+		}
+
+		// Try to load UMD bundle from static folder
+		return new Promise((resolve, reject) => {
+			const script = document.createElement('script');
+			script.src = `${import.meta.env.BASE_URL}js/musicWidgetsBrowser.umd.min.js`;
+			script.onload = () => {
+				if ((window as any).musicWidgetsBrowser) {
+					resolve((window as any).musicWidgetsBrowser);
+				} else {
+					reject(new Error('musicWidgetsBrowser not found on window after script load'));
+				}
+			};
+			script.onerror = () => reject(new Error('Failed to load music-widgets UMD bundle'));
+			document.head.appendChild(script);
+		});
+	}
+
 	onMount(async () => {
 		try {
-			// Dynamically import music-widgets only in browser
-			const musicWidgets = await import('@k-l-lambda/music-widgets');
+			// Load music-widgets via UMD bundle
+			const musicWidgets = await loadMusicWidgets();
 			MIDI = musicWidgets.MIDI;
 			MidiPlayer = musicWidgets.MidiPlayer;
 			MusicNotation = musicWidgets.MusicNotation;
