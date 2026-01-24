@@ -38,14 +38,12 @@ jobs:
           repository: k-l-lambda/web-widgets
           path: music-widgets
 
-      - name: Build lilylet
+      - name: Prepare lilylet
         run: |
           cd lilylet
-          # Remove private package dependency that's not needed for library build
+          # Pre-built lib files are now tracked in git, so no build needed
+          # Just remove private package dependency from package.json
           sed -i '/"@k-l-lambda\/lotus"/d' package.json
-          npm install
-          npm run build:grammar
-          npm run build
 
       - name: Build music-widgets
         run: |
