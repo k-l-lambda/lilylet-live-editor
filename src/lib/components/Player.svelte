@@ -3,7 +3,7 @@
 	import { editorStore } from '$lib/stores/editor';
 	import { getToolkit } from '$lib/verovio/toolkit';
 	import { MIDI, MidiPlayer, MusicNotation } from '@k-l-lambda/music-widgets';
-	import { MidiAudio } from '@k-l-lambda/music-widgets/dist/musicWidgetsBrowser.es.js';
+	import MidiAudio from '@k-l-lambda/music-widgets/lib/MidiAudio';
 
 	// Types for MIDI data structures
 	interface MidiEvent {
