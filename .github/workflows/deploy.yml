@@ -26,24 +26,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Checkout lilylet dependency
-        uses: actions/checkout@v4
-        with:
-          repository: k-l-lambda/lilylet
-          path: lilylet
-
       - name: Checkout music-widgets dependency
         uses: actions/checkout@v4
         with:
           repository: k-l-lambda/web-widgets
           path: music-widgets
-
-      - name: Prepare lilylet
-        run: |
-          cd lilylet
-          # Pre-built lib files are now tracked in git, so no build needed
-          # Just remove private package dependency from package.json
-          sed -i '/"@k-l-lambda\/lotus"/d' package.json
 
       - name: Build music-widgets
         run: |
@@ -54,9 +41,14 @@ jobs:
           mkdir -p ../static/js
           cp dist/musicWidgetsBrowser.umd.min.js ../static/js/
 
-      - name: Update package.json dependency paths
+      - name: Setup npm for GitHub registry
         run: |
-          sed -i 's|"@k-l-lambda/lilylet": "file:../lilylet"|"@k-l-lambda/lilylet": "file:./lilylet"|' package.json
+          echo "@k-l-lambda:registry=https://npm.pkg.github.com" >> .npmrc
+
+      - name: Update package.json dependencies
+        run: |
+          # Use npm registry version of lilylet instead of file path
+          sed -i 's|"@k-l-lambda/lilylet": "file:../lilylet"|"@k-l-lambda/lilylet": "^0.1.1"|' package.json
           # Remove music-widgets from dependencies since we load it via UMD script
           sed -i '/"@k-l-lambda\/music-widgets"/d' package.json
           # Remove package-lock.json since dependency paths change
