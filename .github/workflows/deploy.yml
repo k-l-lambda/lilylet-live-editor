@@ -25,7 +25,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Checkout lilylet dependency
         uses: actions/checkout@v4
@@ -45,9 +44,11 @@ jobs:
       - name: Update package.json dependency path
         run: |
           sed -i 's|"@k-l-lambda/lilylet": "file:../lilylet"|"@k-l-lambda/lilylet": "file:./lilylet"|' package.json
+          # Remove package-lock.json since lilylet path changes
+          rm -f package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build
         env:
