@@ -5,13 +5,16 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	optimizeDeps: {
 		exclude: ['verovio'],
-		include: ['@k-l-lambda/lilylet', '@k-l-lambda/music-widgets']
+		include: ['@k-l-lambda/lilylet']
 	},
 	resolve: {
 		alias: []
 	},
-	ssr: {
-		noExternal: ['@k-l-lambda/music-widgets']
+	build: {
+		commonjsOptions: {
+			include: [/music-widgets/, /node_modules/],
+			transformMixedEsModules: true
+		}
 	},
 	server: {
 		fs: {

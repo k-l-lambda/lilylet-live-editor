@@ -1,9 +1,14 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
 	import { editorStore } from '$lib/stores/editor';
 	import { getToolkit } from '$lib/verovio/toolkit';
-	import * as musicWidgets from '@k-l-lambda/music-widgets';
-	const { MIDI, MidiPlayer, MusicNotation, MidiAudio } = musicWidgets;
+
+	// Music widgets will be loaded dynamically in browser only
+	let MIDI: any;
+	let MidiPlayer: any;
+	let MusicNotation: any;
+	let MidiAudio: any;
 
 	// Types for MIDI data structures
 	interface MidiEvent {
@@ -28,7 +33,7 @@
 	let isPlaying = false;
 	let currentTime = 0;
 	let duration = 0;
-	let midiPlayer: MidiPlayer | null = null;
+	let midiPlayer: any = null;
 	let midiData: MidiNotation | null = null;
 	let isAudioLoaded = false;
 	let audioLoadError: string | null = null;
@@ -52,6 +57,13 @@
 
 	onMount(async () => {
 		try {
+			// Dynamically import music-widgets only in browser
+			const musicWidgets = await import('@k-l-lambda/music-widgets');
+			MIDI = musicWidgets.MIDI;
+			MidiPlayer = musicWidgets.MidiPlayer;
+			MusicNotation = musicWidgets.MusicNotation;
+			MidiAudio = musicWidgets.MidiAudio;
+
 			await MidiAudio.loadPlugin({
 				soundfontUrl: 'https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/',
 				api: 'webaudio'
