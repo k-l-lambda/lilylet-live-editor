@@ -39,6 +39,7 @@ jobs:
           # Remove private package dependency that's not needed for library build
           sed -i '/"@k-l-lambda\/lotus"/d' package.json
           npm install
+          npm run build:grammar
           npm run build
 
       - name: Update package.json dependency path
