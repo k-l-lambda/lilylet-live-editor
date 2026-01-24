@@ -32,6 +32,12 @@ jobs:
           repository: k-l-lambda/lilylet
           path: lilylet
 
+      - name: Checkout music-widgets dependency
+        uses: actions/checkout@v4
+        with:
+          repository: k-l-lambda/web-widgets
+          path: music-widgets
+
       - name: Build lilylet
         run: |
           cd lilylet
@@ -41,10 +47,17 @@ jobs:
           npm run build:grammar
           npm run build
 
-      - name: Update package.json dependency path
+      - name: Build music-widgets
+        run: |
+          cd music-widgets
+          npm install
+          npm run build
+
+      - name: Update package.json dependency paths
         run: |
           sed -i 's|"@k-l-lambda/lilylet": "file:../lilylet"|"@k-l-lambda/lilylet": "file:./lilylet"|' package.json
-          # Remove package-lock.json since lilylet path changes
+          sed -i 's|"@k-l-lambda/music-widgets": "[^"]*"|"@k-l-lambda/music-widgets": "file:./music-widgets"|' package.json
+          # Remove package-lock.json since dependency paths change
           rm -f package-lock.json
 
       - name: Install dependencies
