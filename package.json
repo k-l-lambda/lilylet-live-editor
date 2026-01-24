@@ -1,0 +1,42 @@
+{
+	"name": "lilylet-live-editor",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"deploy": "NODE_ENV=production npm run build && gh-pages -d build"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/adapter-static": "^3.0.0",
+		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"@types/pako": "^2.0.4",
+		"gh-pages": "^6.3.0",
+		"svelte": "^4.2.0",
+		"svelte-check": "^3.6.0",
+		"typescript": "^5.3.0",
+		"vite": "^5.0.0"
+	},
+	"dependencies": {
+		"@codemirror/commands": "^6.3.0",
+		"@codemirror/lang-javascript": "^6.2.0",
+		"@codemirror/language": "^6.10.0",
+		"@codemirror/state": "^6.4.0",
+		"@codemirror/theme-one-dark": "^6.1.0",
+		"@codemirror/view": "^6.25.0",
+		"@k-l-lambda/music-widgets": "^1.0.1",
+		"codemirror": "^6.0.0",
+		"js-base64": "^3.7.0",
+		"@k-l-lambda/lilylet": "file:../lilylet",
+		"pako": "^2.1.0",
+		"verovio": "^4.3.0",
+		"vue": "^3.4.0"
+	}
+}
