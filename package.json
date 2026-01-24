@@ -34,7 +34,7 @@
 		"@k-l-lambda/music-widgets": "^1.0.1",
 		"codemirror": "^6.0.0",
 		"js-base64": "^3.7.0",
-		"@k-l-lambda/lilylet": "^0.1.1",
+		"@k-l-lambda/lilylet": "^0.1.2",
 		"pako": "^2.1.0",
 		"verovio": "^4.3.0",
 		"vue": "^3.4.0"
