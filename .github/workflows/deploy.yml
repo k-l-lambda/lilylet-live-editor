@@ -52,6 +52,11 @@ jobs:
           cd music-widgets
           npm install
           npm run build
+          # Update package.json to point to the dist bundle as main
+          sed -i 's|"main": "lib/index.js"|"main": "dist/musicWidgetsBrowser.common.js"|' package.json
+          # Create a stub lib/index.js that re-exports from dist for subpath imports
+          mkdir -p lib
+          echo 'module.exports = require("../dist/musicWidgetsBrowser.common.js");' > lib/index.js
 
       - name: Update package.json dependency paths
         run: |

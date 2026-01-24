@@ -2,7 +2,8 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { editorStore } from '$lib/stores/editor';
 	import { getToolkit } from '$lib/verovio/toolkit';
-	import { MIDI, MidiPlayer, MusicNotation, MidiAudio } from '@k-l-lambda/music-widgets';
+	import * as musicWidgets from '@k-l-lambda/music-widgets';
+	const { MIDI, MidiPlayer, MusicNotation, MidiAudio } = musicWidgets;
 
 	// Types for MIDI data structures
 	interface MidiEvent {
