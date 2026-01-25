@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lilylet Language Tutorial</title>
+  <style>
+    :root {
+      --bg-primary: #1e1e1e;
+      --bg-secondary: #252526;
+      --bg-tertiary: #2d2d30;
+      --text-primary: #d4d4d4;
+      --text-secondary: #858585;
+      --accent: #0e639c;
+      --accent-hover: #1177bb;
+      --border: #454545;
+      --code-bg: #1a1a1a;
+      --link: #4fc1ff;
+      --success: #4ec9b0;
+      --warning: #dcdcaa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 40px 60px;
+    }
+
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header nav {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    header a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    header a:hover {
+      color: var(--text-primary);
+    }
+
+    header .brand {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 16px;
+    }
+
+    h1 {
+      color: #ffffff;
+      font-size: 2.5em;
+      margin: 1em 0 0.5em;
+      padding-bottom: 0.3em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      color: #ffffff;
+      font-size: 1.8em;
+      margin: 1.5em 0 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h3 {
+      color: var(--success);
+      font-size: 1.3em;
+      margin: 1.2em 0 0.5em;
+    }
+
+    h4 {
+      color: var(--warning);
+      font-size: 1.1em;
+      margin: 1em 0 0.5em;
+    }
+
+    p {
+      margin: 0.8em 0;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    code {
+      font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background: var(--code-bg);
+      padding: 16px 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      margin: 1em 0;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    pre.lilylet-code {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border-left: 4px solid var(--accent);
+    }
+
+    pre.lilylet-code code {
+      color: #e0e0e0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1em 0;
+      font-size: 0.95em;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    th {
+      background: var(--bg-tertiary);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: var(--bg-secondary);
+    }
+
+    ul, ol {
+      padding-left: 1.5em;
+      margin: 0.8em 0;
+    }
+
+    li {
+      margin: 0.3em 0;
+    }
+
+    blockquote {
+      border-left: 4px solid var(--accent);
+      margin: 1em 0;
+      padding: 0.5em 1em;
+      background: var(--bg-secondary);
+      border-radius: 0 4px 4px 0;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2em 0;
+    }
+
+    strong {
+      color: #ffffff;
+    }
+
+    em {
+      color: var(--warning);
+    }
+
+    /* Table of contents styling */
+    .container > ol:first-of-type {
+      background: var(--bg-secondary);
+      padding: 20px 20px 20px 40px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .container > ol:first-of-type li {
+      margin: 0.4em 0;
+    }
+
+    /* Quick reference card styling */
+    h3:contains("Quick Reference") + * {
+      background: var(--bg-tertiary);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px 20px 40px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      h2 {
+        font-size: 1.5em;
+      }
+
+      pre {
+        padding: 12px 14px;
+      }
+
+      table {
+        font-size: 0.85em;
+      }
+
+      th, td {
+        padding: 8px 10px;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+
+      header {
+        display: none;
+      }
+
+      pre {
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+      }
+
+      a {
+        color: #0066cc;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/lilylet-live-editor/" class="brand">Lilylet</a>
+      <a href="/lilylet-live-editor/">Editor</a>
+      <a href="/lilylet-live-editor/markdown">Markdown Demo</a>
+      <a href="/lilylet-live-editor/docs/tutorial.html">Tutorial</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h1>Lilylet Language Tutorial</h1>
+<p>A comprehensive guide to writing music notation with Lilylet, a simplified music notation language inspired by <a href="https://lilypond.org/">LilyPond</a>.</p>
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#basic-notes">Basic Notes</a></li>
+<li><a href="#rhythms-and-durations">Rhythms and Durations</a></li>
+<li><a href="#rests">Rests</a></li>
+<li><a href="#accidentals">Accidentals</a></li>
+<li><a href="#octaves">Octaves</a></li>
+<li><a href="#key-and-time-signatures">Key and Time Signatures</a></li>
+<li><a href="#chords">Chords</a></li>
+<li><a href="#articulations">Articulations</a></li>
+<li><a href="#dynamics">Dynamics</a></li>
+<li><a href="#slurs-ties-and-beams">Slurs, Ties, and Beams</a></li>
+<li><a href="#ornaments">Ornaments</a></li>
+<li><a href="#grace-notes">Grace Notes</a></li>
+<li><a href="#tuplets">Tuplets</a></li>
+<li><a href="#tremolo">Tremolo</a></li>
+<li><a href="#multiple-voices">Multiple Voices</a></li>
+<li><a href="#multiple-staves">Multiple Staves</a></li>
+<li><a href="#advanced-features">Advanced Features</a></li>
+<li><a href="#complete-examples">Complete Examples</a></li>
+</ol>
+<hr>
+<h2>Introduction</h2>
+<p>Lilylet is a text-based music notation language designed for quick and intuitive music entry. It uses a simplified syntax inspired by LilyPond, making it easy to write music without complex boilerplate code.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Simple, readable syntax</li>
+<li>Relative pitch mode (notes are relative to the previous note)</li>
+<li>Support for common music notation elements</li>
+<li>Renders to standard music notation via MEI/Verovio</li>
+</ul>
+<p><strong>Your First Score:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 d e f | g2 g | a4 a a a | g1
+</code></pre><p>This creates a simple melody in C major with quarter notes, half notes, and a whole note.</p>
+<hr>
+<h2>Basic Notes</h2>
+<h3>Note Names</h3>
+<p>Lilylet uses the standard note letter names:</p>
+<table>
+<thead>
+<tr>
+<th>Letter</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>c</td>
+<td>C (Do)</td>
+</tr>
+<tr>
+<td>d</td>
+<td>D (Re)</td>
+</tr>
+<tr>
+<td>e</td>
+<td>E (Mi)</td>
+</tr>
+<tr>
+<td>f</td>
+<td>F (Fa)</td>
+</tr>
+<tr>
+<td>g</td>
+<td>G (Sol)</td>
+</tr>
+<tr>
+<td>a</td>
+<td>A (La)</td>
+</tr>
+<tr>
+<td>b</td>
+<td>B (Ti)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example - C Major Scale:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 d e f | g a b c'
+</code></pre><h3>Case Insensitivity</h3>
+<p>Note names are case-insensitive: <code>C</code>, <code>c</code>, <code>D</code>, <code>d</code> all work the same.</p>
+<hr>
+<h2>Rhythms and Durations</h2>
+<h3>Duration Values</h3>
+<p>Durations are specified by numbers after the note name:</p>
+<table>
+<thead>
+<tr>
+<th>Number</th>
+<th>Duration</th>
+<th>Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Whole note</td>
+<td>Semibreve</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Half note</td>
+<td>Minim</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Quarter note</td>
+<td>Crotchet</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Eighth note</td>
+<td>Quaver</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Sixteenth note</td>
+<td>Semiquaver</td>
+</tr>
+<tr>
+<td>32</td>
+<td>Thirty-second note</td>
+<td>Demisemiquaver</td>
+</tr>
+<tr>
+<td>64</td>
+<td>Sixty-fourth note</td>
+<td>Hemidemisemiquaver</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example - Different Durations:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c1 | c2 c2 | c4 c4 c4 c4 | c8 c8 c8 c8 c8 c8 c8 c8
+</code></pre><h3>Duration Persistence</h3>
+<p>If you omit the duration, the previous duration is used:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 d e f | g a b c'
+</code></pre><p>All notes here are quarter notes because <code>c4</code> sets the duration.</p>
+<h3>Dotted Notes</h3>
+<p>Add a dot (<code>.</code>) after the duration to extend it by half:</p>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>c4.</code></td>
+<td>Dotted quarter (= quarter + eighth)</td>
+</tr>
+<tr>
+<td><code>c2.</code></td>
+<td>Dotted half (= half + quarter)</td>
+</tr>
+<tr>
+<td><code>c4..</code></td>
+<td>Double-dotted quarter</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example - Dotted Rhythms:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 6/8
+c4. d4. | e8 e e f4.
+</code></pre><p><strong>Example - Compound Meter:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 12/8
+c4. d e f | g4 g8 a4. g
+</code></pre><hr>
+<h2>Rests</h2>
+<h3>Basic Rests</h3>
+<p>Use <code>r</code> followed by a duration for rests:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 r4 e4 r4 | g2 r2
+</code></pre><h3>Full Measure Rests</h3>
+<p>Use <code>R</code> for full-measure rests (displayed centered in the measure):</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 d e f | R1 | g4 a b c'
+</code></pre><h3>Space Rests (Invisible)</h3>
+<p>Use <code>s</code> for invisible rests (useful in multi-voice notation):</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 s4 e4 s4
+</code></pre><hr>
+<h2>Accidentals</h2>
+<h3>Sharps and Flats</h3>
+<p>Add <code>s</code> for sharp, <code>f</code> for flat after the note name:</p>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cs</code></td>
+<td>C sharp</td>
+</tr>
+<tr>
+<td><code>cf</code></td>
+<td>C flat</td>
+</tr>
+<tr>
+<td><code>ds</code></td>
+<td>D sharp</td>
+</tr>
+<tr>
+<td><code>ef</code></td>
+<td>E flat</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example - Chromatic Scale:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 cs d ds | e f fs g | gs a as b | c'1
+</code></pre><h3>Double Accidentals</h3>
+<p>Use <code>ss</code> for double-sharp, <code>ff</code> for double-flat:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 css d dff | e1
+</code></pre><p><strong>Example - E Minor Melodic Scale:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\key e \minor
+\time 4/4
+e4 fs g a | b cs' ds' e' | e' ds' cs' b | a g fs e
+</code></pre><hr>
+<h2>Octaves</h2>
+<h3>Relative Pitch Mode</h3>
+<p>Lilylet uses <strong>relative pitch mode</strong>. Each note is interpreted relative to the previous note:</p>
+<ul>
+<li>If the interval is a <strong>fourth or less</strong>, the note stays in the same octave (or nearest)</li>
+<li>If the interval is a <strong>fifth or more</strong>, octave markers may be needed</li>
+</ul>
+<h3>Octave Markers</h3>
+<table>
+<thead>
+<tr>
+<th>Marker</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>'</code> (apostrophe)</td>
+<td>Raise one octave</td>
+</tr>
+<tr>
+<td><code>,</code> (comma)</td>
+<td>Lower one octave</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example - Octave Changes:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 c' c'' c''' | c,, c, c c'
+</code></pre><p><strong>Example - Understanding Relative Mode:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 d e f | g a b c' | c' b a g | f e d c
+</code></pre><p>Notice <code>c'</code> at the end of measure 2 - this is needed because from <code>b</code> up to <code>c</code> would go down (closer), so we use <code>c'</code> to go up.</p>
+<p><strong>Example - Wide Intervals:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 g c' g | c e g c' | c' g e c
+</code></pre><hr>
+<h2>Key and Time Signatures</h2>
+<h3>Time Signature</h3>
+<p>Use <code>\time</code> followed by the meter:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 3/4
+c4 d e | f g a | b c' d' | e'2.
+</code></pre><p><strong>Common Time Signatures:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 d e f | g1
+</code></pre><pre class="lilylet-code"><code class="language-lilylet">\time 3/4
+c4 d e | f2.
+</code></pre><pre class="lilylet-code"><code class="language-lilylet">\time 6/8
+c4. d | e4. f
+</code></pre><pre class="lilylet-code"><code class="language-lilylet">\time 2/2
+c2 d | e f | g1
+</code></pre><h3>Key Signature</h3>
+<p>Use <code>\key</code> followed by the root note and mode:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\key g \major
+\time 4/4
+g4 a b c' | d' e' fs' g'
+</code></pre><pre class="lilylet-code"><code class="language-lilylet">\key d \minor
+\time 4/4
+d4 e f g | a bf cs' d'
+</code></pre><p><strong>Key Signature Examples:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\key c \major
+\time 4/4
+c4 d e f | g a b c'
+</code></pre><pre class="lilylet-code"><code class="language-lilylet">\key f \major
+\time 4/4
+f4 g a bf | c' d' e' f'
+</code></pre><pre class="lilylet-code"><code class="language-lilylet">\key a \minor
+\time 4/4
+a4 b c' d' | e' f' gs' a'
+</code></pre><h3>Clef</h3>
+<p>Use <code>\clef</code> to specify the clef:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\clef "bass"
+\time 4/4
+c4 d e f | g a b c'
+</code></pre><p>Supported clefs: <code>treble</code>, <code>bass</code>, <code>alto</code></p>
+<hr>
+<h2>Chords</h2>
+<h3>Basic Chords</h3>
+<p>Enclose multiple pitches in angle brackets <code>&lt; &gt;</code>:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+&lt;c e g&gt;4 &lt;d f a&gt; &lt;e g b&gt; &lt;f a c'&gt; | &lt;g b d'&gt;1
+</code></pre><h3>Chord Progressions</h3>
+<p><strong>Example - I-IV-V-I Progression:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+&lt;c e g&gt;2 &lt;f a c'&gt; | &lt;g b d'&gt; &lt;c' e' g'&gt; | &lt;c e g&gt;1
+</code></pre><p><strong>Example - Arpeggiated Chords:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c8 e g c' e' g' c'' g' | e' c' g e c4 r
+</code></pre><h3>Chord with Different Durations</h3>
+<p>The duration applies to the entire chord:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+&lt;c e g&gt;4 &lt;c e g&gt;8 &lt;c e g&gt;8 &lt;c e g&gt;2
+</code></pre><hr>
+<h2>Articulations</h2>
+<h3>Common Articulations</h3>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Name</th>
+<th>Symbol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>\staccato</code> or <code>.</code></td>
+<td>Staccato</td>
+<td>Dot</td>
+</tr>
+<tr>
+<td><code>\tenuto</code> or <code>_</code></td>
+<td>Tenuto</td>
+<td>Line</td>
+</tr>
+<tr>
+<td><code>\accent</code> or <code>&gt;</code></td>
+<td>Accent</td>
+<td>&gt;</td>
+</tr>
+<tr>
+<td><code>\marcato</code> or <code>^</code></td>
+<td>Marcato</td>
+<td>^</td>
+</tr>
+<tr>
+<td><code>\staccatissimo</code> or <code>!</code></td>
+<td>Staccatissimo</td>
+<td>Wedge</td>
+</tr>
+<tr>
+<td><code>\portato</code></td>
+<td>Portato</td>
+<td>Line + dot</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example - Staccato:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4. d. e. f. | g4. a. b. c'.
+</code></pre><p><strong>Example - Mixed Articulations:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4\staccato d\tenuto e\accent f\marcato | g4. a_ b&gt; c'^
+</code></pre><h3>Placement (Above/Below)</h3>
+<p>Use <code>^</code> for above, <code>_</code> for below:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4^. d_. e^&gt; f_&gt;
+</code></pre><hr>
+<h2>Dynamics</h2>
+<h3>Dynamic Markings</h3>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>\ppp</code></td>
+<td>Pianississimo (very very soft)</td>
+</tr>
+<tr>
+<td><code>\pp</code></td>
+<td>Pianissimo (very soft)</td>
+</tr>
+<tr>
+<td><code>\p</code></td>
+<td>Piano (soft)</td>
+</tr>
+<tr>
+<td><code>\mp</code></td>
+<td>Mezzo-piano (medium soft)</td>
+</tr>
+<tr>
+<td><code>\mf</code></td>
+<td>Mezzo-forte (medium loud)</td>
+</tr>
+<tr>
+<td><code>\f</code></td>
+<td>Forte (loud)</td>
+</tr>
+<tr>
+<td><code>\ff</code></td>
+<td>Fortissimo (very loud)</td>
+</tr>
+<tr>
+<td><code>\fff</code></td>
+<td>Fortississimo (very very loud)</td>
+</tr>
+<tr>
+<td><code>\sfz</code></td>
+<td>Sforzando (sudden accent)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example - Dynamic Changes:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4\pp d e f | g\mf a b c' | d'\f e' f' g' | a'\ff b' c'' d''
+</code></pre><h3>Hairpins (Crescendo/Diminuendo)</h3>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>\&lt;</code></td>
+<td>Start crescendo</td>
+</tr>
+<tr>
+<td><code>\&gt;</code></td>
+<td>Start diminuendo</td>
+</tr>
+<tr>
+<td><code>\!</code></td>
+<td>End hairpin</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example - Crescendo:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4\p\&lt; d e f | g a b c'\f
+</code></pre><p><strong>Example - Diminuendo:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c'4\f\&gt; b a g | f e d c\p
+</code></pre><p><strong>Example - Full Dynamic Phrase:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4\pp\&lt; d e f | g\mf a b c' | d'\&lt; e' f' g' | a'\ff\&gt; b' a' g' | f'\p e' d' c'
+</code></pre><hr>
+<h2>Slurs, Ties, and Beams</h2>
+<h3>Slurs</h3>
+<p>Use <code>(</code> to start a slur and <code>)</code> to end it:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4( d e f) | g( a b c') | d'( c' b a) | g1
+</code></pre><h3>Ties</h3>
+<p>Use <code>~</code> to tie notes of the same pitch:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c2~ c4 d | e2~ e4 f | g1~ | g2 r2
+</code></pre><p><strong>Example - Syncopation with Ties:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 d8~ d c4 d | e8~ e d4~ d e | f2~ f4 g | a1
+</code></pre><h3>Beams</h3>
+<p>Use <code>[</code> to start a beam and <code>]</code> to end it:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c8[ d e f] g[ a b c'] | d'[ c' b a] g4 r
+</code></pre><p><strong>Example - Custom Beaming:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 6/8
+c8[ d e] f[ g a] | b[ c' d'] e'4.
+</code></pre><hr>
+<h2>Ornaments</h2>
+<h3>Available Ornaments</h3>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>\trill</code></td>
+<td>Trill</td>
+</tr>
+<tr>
+<td><code>\turn</code></td>
+<td>Turn</td>
+</tr>
+<tr>
+<td><code>\mordent</code></td>
+<td>Mordent</td>
+</tr>
+<tr>
+<td><code>\prall</code></td>
+<td>Pralltriller</td>
+</tr>
+<tr>
+<td><code>\fermata</code></td>
+<td>Fermata</td>
+</tr>
+<tr>
+<td><code>\shortfermata</code></td>
+<td>Short fermata</td>
+</tr>
+<tr>
+<td><code>\arpeggio</code></td>
+<td>Arpeggio (for chords)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example - Trills:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c2\trill d | e4\trill f g2 | a1\trill
+</code></pre><p><strong>Example - Fermata:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 d e f | g2\fermata r2 | a4 b c' d' | e'1\fermata
+</code></pre><p><strong>Example - Arpeggiated Chords:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+&lt;c e g&gt;2\arpeggio &lt;d f a&gt;\arpeggio | &lt;e g b&gt;1\arpeggio
+</code></pre><hr>
+<h2>Grace Notes</h2>
+<h3>Grace Note Syntax</h3>
+<p>Use <code>\grace</code> before a note or group of notes:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+\grace d16 c4 e g c' | \grace { b,16 c } d4 f a d'
+</code></pre><p><strong>Example - Appoggiatura Style:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+\grace e16 d4 f a d' | \grace fs16 g4 b d' g'
+</code></pre><p><strong>Example - Multiple Grace Notes:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+\grace { c16[ d e] } f4 a c' f' | \grace { g16[ a] } b4 d' f' b'
+</code></pre><hr>
+<h2>Tuplets</h2>
+<h3>Triplets and Other Tuplets</h3>
+<p>Use <code>\times numerator/denominator { notes }</code>:</p>
+<p><strong>Example - Triplets:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+\times 2/3 { c4 d e } \times 2/3 { f g a } | b2 c'
+</code></pre><p><strong>Example - Eighth Note Triplets:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 \times 2/3 { d8 e f } g4 \times 2/3 { a8 b c' } | d'1
+</code></pre><p><strong>Example - Quintuplets:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+\times 4/5 { c8 d e f g } \times 4/5 { a b c' d' e' } | f'1
+</code></pre><hr>
+<h2>Tremolo</h2>
+<h3>Single-Note Tremolo</h3>
+<p>Use <code>:</code> followed by the tremolo division:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c2:16 d:16 | e1:32
+</code></pre><h3>Two-Note Tremolo</h3>
+<p>Use <code>\repeat tremolo</code>:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+\repeat tremolo 4 { c16 e } \repeat tremolo 4 { d f } | &lt;c e g&gt;1
+</code></pre><hr>
+<h2>Multiple Voices</h2>
+<h3>Voice Separator</h3>
+<p>Use <code>\\</code> to separate voices on the same staff:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+\stemUp c'2 d' \\ \stemDown g2 a | \stemUp e'2 f' \\ \stemDown b2 c'
+</code></pre><p><strong>Example - Two-Voice Counterpoint:</strong></p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+\stemUp e'4 d' c' b \\ \stemDown c4 g a e | \stemUp c'2 b \\ \stemDown f2 g | \stemUp c'1 \\ \stemDown c1
+</code></pre><h3>Stem Direction</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>\stemUp</code></td>
+<td>Force stems up</td>
+</tr>
+<tr>
+<td><code>\stemDown</code></td>
+<td>Force stems down</td>
+</tr>
+<tr>
+<td><code>\stemNeutral</code></td>
+<td>Automatic</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Multiple Staves</h2>
+<h3>Part Separator</h3>
+<p>Use <code>\\\</code> (triple backslash) to separate different staves/parts:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+\clef "treble" c'4 d' e' f' | g'1 \\\
+\clef "bass" c4 g, c g, | c1
+</code></pre><h3>Staff Assignment</h3>
+<p>Use <code>\staff &quot;N&quot;</code> to assign notes to a specific staff:</p>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+\staff "1" \clef "treble" c'4 e' g' c'' \\
+\staff "2" \clef "bass" c4 g c' g |
+\staff "1" d'4 f' a' d'' \\
+\staff "2" d4 a d' a
+</code></pre><hr>
+<h2>Advanced Features</h2>
+<h3>Tempo Markings</h3>
+<pre class="lilylet-code"><code class="language-lilylet">\tempo "Allegro" 4=120
+\time 4/4
+c4 d e f | g a b c'
+</code></pre><pre class="lilylet-code"><code class="language-lilylet">\tempo "Andante" 4=72
+\time 3/4
+c4 e g | c'2.
+</code></pre><h3>Ottava (Octave Transposition)</h3>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4 d e f | \ottava #1 g a b c' | d' e' f' g' | \ottava #0 a b c' d'
+</code></pre><h3>Pedal Markings</h3>
+<pre class="lilylet-code"><code class="language-lilylet">\time 4/4
+c4\sustainOn e g c' | e' g' c'' g' | e' c' g e | c1\sustainOff
+</code></pre><h3>Metadata Headers</h3>
+<p>Add metadata at the beginning of your score:</p>
+<pre class="lilylet-code"><code class="language-lilylet">[title "Minuet in G"]
+[composer "J.S. Bach"]
+
+\key g \major
+\time 3/4
+d'4 g'8 a' b' c'' | b'4 a' g'
+</code></pre><hr>
+<h2>Complete Examples</h2>
+<h3>Example 1: Simple Melody</h3>
+<pre class="lilylet-code"><code class="language-lilylet">[title "Twinkle Twinkle"]
+
+\time 4/4
+c4 c g' g' | a' a' g'2 | f'4 f' e' e' | d' d' c'2 |
+g'4 g' f' f' | e' e' d'2 | g'4 g' f' f' | e' e' d'2 |
+c4 c g' g' | a' a' g'2 | f'4 f' e' e' | d' d' c'2
+</code></pre><h3>Example 2: Piano Style with Chords</h3>
+<pre class="lilylet-code"><code class="language-lilylet">[title "Simple Waltz"]
+
+\key g \major
+\time 3/4
+\stemUp d'4 g' b' \\ \stemDown &lt;g b&gt;4 &lt;g b&gt; &lt;g b&gt; |
+\stemUp d'4 a' c'' \\ \stemDown &lt;fs a&gt;4 &lt;fs a&gt; &lt;fs a&gt; |
+\stemUp d'4 g' b' \\ \stemDown &lt;g b&gt;4 &lt;g b&gt; &lt;g b&gt; |
+\stemUp d'2. \\ \stemDown &lt;g b d'&gt;2.
+</code></pre><h3>Example 3: With Dynamics and Articulations</h3>
+<pre class="lilylet-code"><code class="language-lilylet">[title "Expressive Melody"]
+
+\time 4/4
+c4\p( d e f) | g2\&lt; a | b4\mf\&gt; a g f | e2\p d |
+c4\pp( e g c') | d'2.\fermata r4
+</code></pre><h3>Example 4: Two-Staff Piano Score</h3>
+<pre class="lilylet-code"><code class="language-lilylet">[title "Piano Exercise"]
+[composer "Practice"]
+
+\time 4/4
+\staff "1" \clef "treble" \stemUp c'4 e' g' c'' | d''2 c'' \\
+\staff "2" \clef "bass" c4 g c' g | g2 c' |
+
+\staff "1" b'4 g' e' c' | d'2 c' \\
+\staff "2" g4 e c g, | g,2 c
+</code></pre><h3>Example 5: Baroque Style</h3>
+<pre class="lilylet-code"><code class="language-lilylet">[title "Baroque Prelude"]
+
+\key d \minor
+\time 4/4
+d8[ f a d'] f'[ a' d'' a'] | f'[ d' a f] d[ f a d'] |
+\times 2/3 { e8 g bf } \times 2/3 { e' g' bf' } e''4 r |
+\grace cs'16 d'4 \grace e'16 f'4 \grace g'16 a'2
+</code></pre><h3>Example 6: Modern Rhythms</h3>
+<pre class="lilylet-code"><code class="language-lilylet">[title "Syncopated"]
+
+\time 4/4
+c4. d8~ d4 e | f8 g4 a8~ a4 b |
+c'8\&lt; d'4 e'8 f'4 g' | a'\ff\&gt; g'8 f'~ f'4\p r
+</code></pre><hr>
+<h2>Quick Reference Card</h2>
+<h3>Notes</h3>
+<p><code>c d e f g a b</code> - Note names
+<code>cs ds es fs gs as bs</code> - Sharps
+<code>cf df ef ff gf af bf</code> - Flats</p>
+<h3>Durations</h3>
+<p><code>1</code> whole, <code>2</code> half, <code>4</code> quarter, <code>8</code> eighth, <code>16</code> sixteenth
+<code>.</code> dot, <code>..</code> double dot</p>
+<h3>Octaves</h3>
+<p><code>'</code> up, <code>,</code> down</p>
+<h3>Measures</h3>
+<p><code>|</code> bar line</p>
+<h3>Chords</h3>
+<p><code>&lt;c e g&gt;4</code> - C major chord, quarter note</p>
+<h3>Articulations</h3>
+<p><code>.</code> staccato, <code>_</code> tenuto, <code>&gt;</code> accent, <code>^</code> marcato</p>
+<h3>Dynamics</h3>
+<p><code>\pp \p \mp \mf \f \ff</code>
+<code>\&lt;</code> crescendo, <code>\&gt;</code> diminuendo, <code>\!</code> end</p>
+<h3>Slurs/Ties/Beams</h3>
+<p><code>(</code> <code>)</code> slurs, <code>~</code> tie, <code>[</code> <code>]</code> beams</p>
+<h3>Structure</h3>
+<p><code>\\</code> voice separator, <code>\\\</code> staff separator</p>
+<h3>Commands</h3>
+<p><code>\key c \major</code>, <code>\time 4/4</code>, <code>\clef &quot;treble&quot;</code>, <code>\tempo &quot;Allegro&quot; 4=120</code></p>
+<hr>
+<h2>Tips for Effective Writing</h2>
+<ol>
+<li><strong>Start simple</strong> - Begin with the melody, add complexity later</li>
+<li><strong>Use duration persistence</strong> - Set duration once, it carries forward</li>
+<li><strong>Think in intervals</strong> - Relative mode works best when you think about the distance between notes</li>
+<li><strong>Use octave markers sparingly</strong> - Only when jumping more than a fourth</li>
+<li><strong>Add dynamics last</strong> - Get the notes right first, then add expression</li>
+<li><strong>Test frequently</strong> - Use the live editor to hear your work as you write</li>
+</ol>
+<hr>
+<p><em>This tutorial covers the core features of Lilylet. For more advanced notation, consult the <a href="https://lilypond.org/doc/">LilyPond documentation</a> which Lilylet’s syntax is based upon.</em></p>
+
+  </div>
+</body>
+</html>
