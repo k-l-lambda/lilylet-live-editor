@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
+	import { base } from '$app/paths';
 	import Editor from '$lib/components/Editor.svelte';
 	import Preview from '$lib/components/Preview.svelte';
 	import { editorStore } from '$lib/stores/editor';
@@ -111,8 +112,8 @@
 		<h1>Lilylet Live Editor</h1>
 		<nav>
 			<span class="current">Editor</span>
-			<a href="/markdown">Markdown Demo</a>
-			<a href="/docs/lilylet-tutorial.html" target="_blank">Tutorial</a>
+			<a href="{base}/markdown">Markdown Demo</a>
+			<a href="{base}/docs/lilylet-tutorial.html" target="_blank">Tutorial</a>
 		</nav>
 		<div class="header-actions">
 			<button class="share-btn" on:click={handleShare}>

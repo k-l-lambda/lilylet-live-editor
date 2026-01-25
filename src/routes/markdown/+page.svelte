@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
+	import { base } from '$app/paths';
 	import MarkdownIt from 'markdown-it';
 	import lilyletPlugin from '@k-l-lambda/lilylet-markdown';
 	import { initVerovio, getToolkit } from '$lib/verovio/toolkit';
@@ -565,9 +566,9 @@ console.log('Hello, Lilylet!');
 	<header>
 		<h1>Lilylet Markdown Demo</h1>
 		<nav>
-			<a href="/">Live Editor</a>
+			<a href="{base}/">Live Editor</a>
 			<span class="current">Markdown</span>
-			<a href="/docs/lilylet-tutorial.html" target="_blank">Tutorial</a>
+			<a href="{base}/docs/lilylet-tutorial.html" target="_blank">Tutorial</a>
 		</nav>
 		<span class="status">
 			{#if !verovioReady}

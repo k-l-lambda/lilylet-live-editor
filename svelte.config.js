@@ -9,13 +9,14 @@ const config = {
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',
-			fallback: 'index.html',
+			fallback: '404.html',
 			precompress: false,
 			strict: true
 		}),
 		paths: {
 			base: process.env.NODE_ENV === 'production' ? '/lilylet-live-editor' : ''
-		}
+		},
+		trailingSlash: 'never'
 	}
 };
 
