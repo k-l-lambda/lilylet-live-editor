@@ -113,6 +113,7 @@
 		<nav>
 			<span class="current">Editor</span>
 			<a href="/markdown">Markdown Demo</a>
+			<a href="/docs/lilylet-tutorial.md" target="_blank">Tutorial</a>
 		</nav>
 		<div class="header-actions">
 			<button class="share-btn" on:click={handleShare}>

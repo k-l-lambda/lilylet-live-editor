@@ -568,6 +568,7 @@ console.log('Hello, Lilylet!');
 		<nav>
 			<a href="/">Live Editor</a>
 			<span class="current">Markdown</span>
+			<a href="/docs/lilylet-tutorial.md" target="_blank">Tutorial</a>
 		</nav>
 		<span class="status">
 			{#if !verovioReady}
