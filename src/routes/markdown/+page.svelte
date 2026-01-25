@@ -15,8 +15,7 @@ This demonstrates embedding **Lilylet music notation** in Markdown documents.
 \`\`\`lilylet
 \\key c \\major
 \\time 4/4
-
-c4 d e f | g' a b c | c'1
+c4 d e f | g a b c | c1
 \`\`\`
 
 ## Playable Example
@@ -25,7 +24,7 @@ Use \`lyl.play\` or \`lilylet.play\` to make the score playable:
 
 \`\`\`lyl.play
 \\time 4/4
-c'4 d' e' f' | g'4 a' b' c'' | <c' e' g'>2 <g b d'>2 | c''1
+c4 d e f | g a b c | <c e g>2 <g, b d>2 | c1
 \`\`\`
 
 ## Another Playable
@@ -33,7 +32,7 @@ c'4 d' e' f' | g'4 a' b' c'' | <c' e' g'>2 <g b d'>2 | c''1
 \`\`\`lilylet.play
 \\time 3/4
 \\key g \\major
-g'4 a' b' | d''2. | b'4 a' g' | g'2.
+g4 a b | d'2. | b4 a g | g2.
 \`\`\`
 
 ## Regular Code Block

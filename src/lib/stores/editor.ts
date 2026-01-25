@@ -15,14 +15,7 @@ export interface EditorState {
 const initialState: EditorState = {
 	code: `\\key c \\major
 \\time 4/4
-
-c'4 d' e' f' | %1
-
-g'4 a' b' c'' | %2
-
-<c' e' g'>2 <d' f' a'>2 | %3
-
-c''1 | %4
+c4 d e f | g a b c | <c e g>2 <d f a>2 | c1
 `,
 	error: null,
 	mei: null,

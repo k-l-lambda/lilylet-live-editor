@@ -118,17 +118,17 @@ Each line starts fresh from middle C, so both lines produce the same ascending p
 **Without line break** - continuous pitch:
 ```lilylet
 \time 4/4
-c4 d e f | g a b c' | c' b a g | f e d c
+c4 d e f | g a b c | c b a g | f e d c
 ```
 
 **With line break** - pitch resets at each line:
 ```lilylet
 \time 4/4
-c4 d e f | g a b c'
+c4 d e f | g a b c
 c' b a g | f e d c
 ```
 
-In the second example, the newline resets the reference pitch to middle C, so `c'` is explicitly needed on line 2 to place it in the higher octave.
+In the second example, the newline resets the reference pitch to middle C, so `c'` is explicitly needed on line 2 to start from C5 (since without the marker, `c` would be middle C).
 
 ### Practical Tips
 
@@ -141,11 +141,11 @@ In the second example, the newline resets the reference pitch to middle C, so `c
 
 ```lilylet
 \time 4/4
-c4 d e f | g a b c'
-d'4 e' f' g' | a' b' c'' d''
+c4 d e f | g a b c
+c'4 d e f | g a b c
 ```
 
-The second line starts `d'` with an explicit octave marker because the line break reset the pitch base to middle C.
+Each line starts with an explicit octave marker (`c'` on line 2) because the line break reset the pitch base to middle C. Subsequent notes flow naturally from there.
 
 ---
 
@@ -178,7 +178,7 @@ If you omit the duration, the previous duration is used:
 
 ```lilylet
 \time 4/4
-c4 d e f | g a b c'
+c4 d e f | g a b c
 ```
 
 All notes here are quarter notes because `c4` sets the duration.
@@ -226,7 +226,7 @@ Use `R` for full-measure rests (displayed centered in the measure):
 
 ```lilylet
 \time 4/4
-c4 d e f | R1 | g4 a b c'
+c4 d e f | R1 | g4 a b c
 ```
 
 ### Space Rests (Invisible)
@@ -257,7 +257,7 @@ Add `s` for sharp, `f` for flat after the note name:
 
 ```lilylet
 \time 4/4
-c4 cs d ds | e f fs g | gs a as b | c'1
+c4 cs d ds | e f fs g | gs a as b | c1
 ```
 
 ### Double Accidentals
@@ -274,7 +274,7 @@ c4 css d dff | e1
 ```lilylet
 \key e \minor
 \time 4/4
-e4 fs g a | b cs' ds' e' | e' ds' cs' b | a g fs e
+e4 fs g a | b cs ds e | e ds cs b | a g fs e
 ```
 
 ---
@@ -307,16 +307,16 @@ c4 c' c'' c''' | c,, c, c c'
 
 ```lilylet
 \time 4/4
-c4 d e f | g a b c' | c' b a g | f e d c
+c4 d e f | g a b c | c b a g | f e d c
 ```
 
-Notice `c'` at the end of measure 2 - this is needed because from `b` the closest `c` would be down a seventh rather than up a semitone, so we use `c'` to explicitly go up.
+Note: From `b` (B4), the closest `c` is C5 (up a half step), not C4 (down 11 half steps). So `c` after `b` naturally goes up to C5 without needing any octave marker.
 
 **Example - Wide Intervals:**
 
 ```lilylet
 \time 4/4
-c4 g c' g | c e g c' | c' g e c
+c4 g c g | c e g c | c g e c
 ```
 
 ---
@@ -329,7 +329,7 @@ Use `\time` followed by the meter:
 
 ```lilylet
 \time 3/4
-c4 d e | f g a | b c' d' | e'2.
+c4 d e | f g a | b c d | e2.
 ```
 
 **Common Time Signatures:**
@@ -361,13 +361,13 @@ Use `\key` followed by the root note and mode:
 ```lilylet
 \key g \major
 \time 4/4
-g4 a b c' | d' e' fs' g'
+g4 a b c | d e fs g
 ```
 
 ```lilylet
 \key d \minor
 \time 4/4
-d4 e f g | a bf cs' d'
+d4 e f g | a bf cs d
 ```
 
 **Key Signature Examples:**
@@ -375,19 +375,19 @@ d4 e f g | a bf cs' d'
 ```lilylet
 \key c \major
 \time 4/4
-c4 d e f | g a b c'
+c4 d e f | g a b c
 ```
 
 ```lilylet
 \key f \major
 \time 4/4
-f4 g a bf | c' d' e' f'
+f4 g a bf | c d e f
 ```
 
 ```lilylet
 \key a \minor
 \time 4/4
-a4 b c' d' | e' f' gs' a'
+a4 b c d | e f gs a
 ```
 
 ### Clef
@@ -412,7 +412,7 @@ Enclose multiple pitches in angle brackets `< >`:
 
 ```lilylet
 \time 4/4
-<c e g>4 <d f a> <e g b> <f a c'> | <g b d'>1
+<c e g>4 <d f a> <e g b> <f a c> | <g b d>1
 ```
 
 ### Chord Progressions
@@ -421,14 +421,14 @@ Enclose multiple pitches in angle brackets `< >`:
 
 ```lilylet
 \time 4/4
-<c e g>2 <f a c'> | <g b d'> <c' e' g'> | <c e g>1
+<c e g>2 <f, a c> | <g, b d> <c e g> | <c e g>1
 ```
 
 **Example - Arpeggiated Chords:**
 
 ```lilylet
 \time 4/4
-c8 e g c' e' g' c'' g' | e' c' g e c4 r
+c8 e g c e g c g | e c g, e, c,4 r
 ```
 
 ### Chord with Different Durations
@@ -465,14 +465,14 @@ Lilylet supports both LilyPond-style commands and shorthand notation:
 
 ```lilylet
 \time 4/4
-c4-. d-. e-. f-. | g4\staccato a\staccato b\staccato c'\staccato
+c4-. d-. e-. f-. | g4\staccato a\staccato b\staccato c\staccato
 ```
 
 **Example - Mixed Articulations:**
 
 ```lilylet
 \time 4/4
-c4\staccato d\tenuto e\accent f\marcato | g4-. a-- b-> c'-^
+c4\staccato d\tenuto e\accent f\marcato | g4-. a-- b-> c-^
 ```
 
 ### Placement (Above/Below)
@@ -508,7 +508,7 @@ c4^. d_. e^> f_>
 
 ```lilylet
 \time 4/4
-c4\pp d e f | g\mf a b c' | d'\f e' f' g' | a'\ff b' c'' d''
+c4\pp d e f | g\mf a b c | d\f e f g | a\ff b c d
 ```
 
 ### Hairpins (Crescendo/Diminuendo)
@@ -523,7 +523,7 @@ c4\pp d e f | g\mf a b c' | d'\f e' f' g' | a'\ff b' c'' d''
 
 ```lilylet
 \time 4/4
-c4\p\< d e f | g a b c'\f
+c4\p\< d e f | g a b c\f
 ```
 
 **Example - Diminuendo:**
@@ -537,7 +537,7 @@ c'4\f\> b a g | f e d c\p
 
 ```lilylet
 \time 4/4
-c4\pp\< d e f | g\mf a b c' | d'\< e' f' g' | a'\ff\> b' a' g' | f'\p e' d' c'
+c4\pp\< d e f | g\mf a b c | d\< e f g | a\ff\> b a g | f\p e d c
 ```
 
 ---
@@ -550,7 +550,7 @@ Use `(` to start a slur and `)` to end it:
 
 ```lilylet
 \time 4/4
-c4( d e f) | g( a b c') | d'( c' b a) | g1
+c4( d e f) | g( a b c) | c( b a g) | f1
 ```
 
 ### Ties
@@ -575,14 +575,14 @@ Use `[` to start a beam and `]` to end it:
 
 ```lilylet
 \time 4/4
-c8[ d e f] g[ a b c'] | d'[ c' b a] g4 r
+c8[ d e f] g[ a b c] | c[ b a g] f4 r
 ```
 
 **Example - Custom Beaming:**
 
 ```lilylet
 \time 6/8
-c8[ d e] f[ g a] | b[ c' d'] e'4.
+c8[ d e] f[ g a] | b[ c d] e4.
 ```
 
 ---
@@ -612,7 +612,7 @@ c2\trill d | e4\trill f g2 | a1\trill
 
 ```lilylet
 \time 4/4
-c4 d e f | g2\fermata r2 | a4 b c' d' | e'1\fermata
+c4 d e f | g2\fermata r2 | a4 b c d | e1\fermata
 ```
 
 **Example - Arpeggiated Chords:**
@@ -646,7 +646,7 @@ Use `\grace` before a note or group of notes:
 
 ```lilylet
 \time 4/4
-\grace { c16[ d e] } f4 a c' f' | \grace { g16[ a] } b4 d' f' b'
+\grace { c16[ d e] } f4 a c f | \grace { g16[ a] } b4 d f b
 ```
 
 ---
@@ -661,21 +661,21 @@ Use `\times numerator/denominator { notes }`:
 
 ```lilylet
 \time 4/4
-\times 2/3 { c4 d e } \times 2/3 { f g a } | b2 c'
+\times 2/3 { c4 d e } \times 2/3 { f g a } | b2 c
 ```
 
 **Example - Eighth Note Triplets:**
 
 ```lilylet
 \time 4/4
-c4 \times 2/3 { d8 e f } g4 \times 2/3 { a8 b c' } | d'1
+c4 \times 2/3 { d8 e f } g4 \times 2/3 { a8 b c } | d1
 ```
 
 **Example - Quintuplets:**
 
 ```lilylet
 \time 4/4
-\times 4/5 { c8 d e f g } \times 4/5 { a b c' d' e' } | f'1
+\times 4/5 { c8 d e f g } \times 4/5 { a b c d e } | f1
 ```
 
 ---
@@ -763,27 +763,27 @@ Use `\staff "N"` to assign notes to a specific staff:
 ```lilylet
 \tempo "Allegro" 4=120
 \time 4/4
-c4 d e f | g a b c'
+c4 d e f | g a b c
 ```
 
 ```lilylet
 \tempo "Andante" 4=72
 \time 3/4
-c4 e g | c'2.
+c4 e g | c2.
 ```
 
 ### Ottava (Octave Transposition)
 
 ```lilylet
 \time 4/4
-c4 d e f | \ottava #1 g a b c' | d' e' f' g' | \ottava #0 a b c' d'
+c4 d e f | \ottava #1 g a b c | d e f g | \ottava #0 a b c d
 ```
 
 ### Pedal Markings
 
 ```lilylet
 \time 4/4
-c4\sustainOn e g c' | e' g' c'' g' | e' c' g e | c1\sustainOff
+c4\sustainOn e g c | e g c g | e c g, e, | c,1\sustainOff
 ```
 
 ### Metadata Headers
@@ -796,7 +796,7 @@ Add metadata at the beginning of your score:
 
 \key g \major
 \time 3/4
-d'4 g'8 a' b' c'' | b'4 a' g'
+d'4 g8 a b c | b4 a g
 ```
 
 ---
@@ -809,9 +809,7 @@ d'4 g'8 a' b' c'' | b'4 a' g'
 [title "Twinkle Twinkle"]
 
 \time 4/4
-c4 c g' g' | a' a' g'2 | f'4 f' e' e' | d' d' c'2 |
-g'4 g' f' f' | e' e' d'2 | g'4 g' f' f' | e' e' d'2 |
-c4 c g' g' | a' a' g'2 | f'4 f' e' e' | d' d' c'2
+c4 c g g | a a g2 | f4 f e e | d d c2 | g4 g f f | e e d2 | g4 g f f | e e d2 | c4 c g g | a a g2 | f4 f e e | d d c2
 ```
 
 ### Example 2: Piano Style with Chords
@@ -833,8 +831,7 @@ c4 c g' g' | a' a' g'2 | f'4 f' e' e' | d' d' c'2
 [title "Expressive Melody"]
 
 \time 4/4
-c4\p( d e f) | g2\< a | b4\mf\> a g f | e2\p d |
-c4\pp( e g c') | d'2.\fermata r4
+c4\p( d e f) | g2\< a | b4\mf\> a g f | e2\p d | c4\pp( e g c) | c2.\fermata r4
 ```
 
 ### Example 4: Two-Staff Piano Score
@@ -858,9 +855,7 @@ c4\pp( e g c') | d'2.\fermata r4
 
 \key d \minor
 \time 4/4
-d8[ f a d'] f'[ a' d'' a'] | f'[ d' a f] d[ f a d'] |
-\times 2/3 { e8 g bf } \times 2/3 { e' g' bf' } e''4 r |
-\grace cs'16 d'4 \grace e'16 f'4 \grace g'16 a'2
+d8[ f a d] f[ a d a] | f[ d a, f,] d,[ f, a, d] | \times 2/3 { e8 g bf } \times 2/3 { e g bf } e4 r | \grace cs16 d4 \grace e16 f4 \grace g16 a2
 ```
 
 ### Example 6: Modern Rhythms
@@ -869,8 +864,7 @@ d8[ f a d'] f'[ a' d'' a'] | f'[ d' a f] d[ f a d'] |
 [title "Syncopated"]
 
 \time 4/4
-c4. d8~ d4 e | f8 g4 a8~ a4 b |
-c'8\< d'4 e'8 f'4 g' | a'\ff\> g'8 f'~ f'4\p r
+c4. d8~ d4 e | f8 g4 a8~ a4 b | c8\< d4 e8 f4 g | a\ff\> g8 f~ f4\p r
 ```
 
 ---
