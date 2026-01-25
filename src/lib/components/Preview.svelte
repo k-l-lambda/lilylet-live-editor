@@ -138,7 +138,16 @@
 	</div>
 
 	<div class="preview-container">
-		{#if $editorStore.error}
+		{#if !$editorStore.verovioReady}
+			<div class="loading-container">
+				<div class="loading-spinner">
+					<div class="spinner-ring"></div>
+					<div class="spinner-ring"></div>
+					<div class="spinner-ring"></div>
+				</div>
+				<p class="loading-text">Loading Verovio...</p>
+			</div>
+		{:else if $editorStore.error}
 			<div class="error-message">
 				<div class="error-title">Error</div>
 				<pre>{$editorStore.error}</pre>
@@ -260,6 +269,69 @@
 		color: #858585;
 		text-align: center;
 		padding: 40px;
+	}
+
+	.loading-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 60px;
+	}
+
+	.loading-spinner {
+		position: relative;
+		width: 60px;
+		height: 60px;
+	}
+
+	.spinner-ring {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+		border: 3px solid transparent;
+		animation: spin 1.5s linear infinite;
+	}
+
+	.spinner-ring:nth-child(1) {
+		border-top-color: #569cd6;
+		animation-delay: 0s;
+	}
+
+	.spinner-ring:nth-child(2) {
+		width: 80%;
+		height: 80%;
+		top: 10%;
+		left: 10%;
+		border-right-color: #4ec9b0;
+		animation-delay: 0.15s;
+		animation-direction: reverse;
+	}
+
+	.spinner-ring:nth-child(3) {
+		width: 60%;
+		height: 60%;
+		top: 20%;
+		left: 20%;
+		border-bottom-color: #ce9178;
+		animation-delay: 0.3s;
+	}
+
+	@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+
+	.loading-text {
+		margin-top: 20px;
+		color: #858585;
+		font-size: 14px;
+		animation: pulse 1.5s ease-in-out infinite;
 	}
 
 	.spacer {

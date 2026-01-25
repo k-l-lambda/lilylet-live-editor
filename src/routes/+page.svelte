@@ -8,7 +8,6 @@
 	import { getStateFromUrl, copyShareUrl } from '$lib/utils/share';
 	import { initVerovio, getToolkit } from '$lib/verovio/toolkit';
 
-	let verovioReady = false;
 	let shareStatus: 'idle' | 'copied' | 'error' = 'idle';
 	let lastRenderedCode = '';
 
@@ -16,7 +15,7 @@
 	let currentRenderId = 0;
 
 	// Watch for code changes and re-render (only when code actually changes)
-	$: if (browser && verovioReady && $editorStore.code && $editorStore.code !== lastRenderedCode) {
+	$: if (browser && $editorStore.verovioReady && $editorStore.code && $editorStore.code !== lastRenderedCode) {
 		lastRenderedCode = $editorStore.code;
 		renderScore($editorStore.code);
 	}
@@ -32,7 +31,7 @@
 	async function setupVerovio() {
 		try {
 			await initVerovio();
-			verovioReady = true;
+			editorStore.setVerovioReady(true);
 		} catch (err) {
 			console.error('Failed to initialize Verovio:', err);
 			editorStore.setError('Failed to initialize Verovio: ' + String(err));
@@ -126,7 +125,7 @@
 				{/if}
 			</button>
 			<span class="status">
-				{#if !verovioReady}
+				{#if !$editorStore.verovioReady}
 					Loading Verovio...
 				{:else}
 					Ready

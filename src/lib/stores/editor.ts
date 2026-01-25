@@ -7,6 +7,7 @@ export interface EditorState {
 	svg: string | null;
 	pageCount: number;
 	isRendering: boolean;
+	verovioReady: boolean;
 	cursorElementId: string | null;
 }
 
@@ -28,6 +29,7 @@ c''1 | %4
 	svg: null,
 	pageCount: 0,
 	isRendering: false,
+	verovioReady: false,
 	cursorElementId: null
 };
 
@@ -42,6 +44,7 @@ function createEditorStore() {
 			update((s) => ({ ...s, svg, pageCount, error: null })),
 		setError: (error: string) => update((s) => ({ ...s, error, svg: null })),
 		setRendering: (isRendering: boolean) => update((s) => ({ ...s, isRendering })),
+		setVerovioReady: (verovioReady: boolean) => update((s) => ({ ...s, verovioReady })),
 		setCursorElement: (cursorElementId: string | null) => update((s) => ({ ...s, cursorElementId })),
 		reset: () => set(initialState)
 	};
