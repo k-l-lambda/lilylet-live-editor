@@ -54,6 +54,7 @@ console.log('Hello, Lilylet!');
 	interface BlockPlayer {
 		id: string;
 		element: HTMLElement;
+		mei: string;
 		midiData: any;
 		midiPlayer: any;
 		isPlaying: boolean;
@@ -63,9 +64,12 @@ console.log('Hello, Lilylet!');
 		playStartTime: number;
 		lastEventIndex: number;
 		pausedTime: number;
+		highlightedNotes: Set<string>;
+		lastHighlightUpdate: number;
 	}
 	let blockPlayers: Map<string, BlockPlayer> = new Map();
 	let playingBlockId: string | null = null;
+	const HIGHLIGHT_THROTTLE_MS = 50;
 
 	let renderedHtml = '';
 	let verovioReady = false;
@@ -195,6 +199,68 @@ console.log('Hello, Lilylet!');
 		}
 	}
 
+	function updateHighlights(player: BlockPlayer, time: number) {
+		const toolkit = getToolkit();
+		if (!toolkit) return;
+
+		try {
+			// Load MEI for this block to get correct element timing
+			toolkit.loadData(player.mei);
+
+			// Get elements at current time (time is in ms)
+			const result = toolkit.getElementsAtTime(time);
+			const newNotes = new Set<string>(result.notes || []);
+
+			// Find notes within this block's SVG
+			const svg = player.element.querySelector('svg');
+			if (!svg) return;
+
+			// Remove highlights from notes no longer playing
+			player.highlightedNotes.forEach(id => {
+				if (!newNotes.has(id)) {
+					const element = svg.querySelector(`#${id}`);
+					if (element) {
+						element.classList.remove('verovio-highlight');
+					}
+				}
+			});
+
+			// Add highlights to new notes
+			newNotes.forEach(id => {
+				if (!player.highlightedNotes.has(id)) {
+					const element = svg.querySelector(`#${id}`);
+					if (element) {
+						element.classList.add('verovio-highlight');
+					}
+				}
+			});
+
+			player.highlightedNotes = newNotes;
+		} catch (error) {
+			// Ignore errors during highlight update
+		}
+	}
+
+	function updateHighlightsThrottled(player: BlockPlayer, time: number) {
+		const now = performance.now();
+		if (now - player.lastHighlightUpdate < HIGHLIGHT_THROTTLE_MS) return;
+		player.lastHighlightUpdate = now;
+		updateHighlights(player, time);
+	}
+
+	function clearHighlights(player: BlockPlayer) {
+		const svg = player.element.querySelector('svg');
+		if (!svg) return;
+
+		player.highlightedNotes.forEach(id => {
+			const element = svg.querySelector(`#${id}`);
+			if (element) {
+				element.classList.remove('verovio-highlight');
+			}
+		});
+		player.highlightedNotes = new Set();
+	}
+
 	function togglePlay(blockId: string) {
 		const player = blockPlayers.get(blockId);
 		if (!player || !player.midiData) return;
@@ -253,6 +319,9 @@ console.log('Hello, Lilylet!');
 				}
 			}
 
+			// Update note highlights
+			updateHighlightsThrottled(player, elapsed);
+
 			updatePlayerUI(player);
 
 			if (elapsed >= player.duration) {
@@ -294,6 +363,7 @@ console.log('Hello, Lilylet!');
 			playingBlockId = null;
 		}
 		MidiAudio?.stopAllNotes?.();
+		clearHighlights(player);
 		updatePlayerUI(player);
 	}
 
@@ -357,6 +427,7 @@ console.log('Hello, Lilylet!');
 			const player: BlockPlayer = {
 				id: blockId,
 				element: el,
+				mei: mei,
 				midiData: notation,
 				midiPlayer: null,
 				isPlaying: false,
@@ -365,7 +436,9 @@ console.log('Hello, Lilylet!');
 				updateInterval: null,
 				playStartTime: 0,
 				lastEventIndex: 0,
-				pausedTime: 0
+				pausedTime: 0,
+				highlightedNotes: new Set(),
+				lastHighlightUpdate: 0
 			};
 
 			blockPlayers.set(blockId, player);
@@ -776,5 +849,14 @@ console.log('Hello, Lilylet!');
 		background: #0e639c;
 		width: 0%;
 		transition: width 0.1s linear;
+	}
+
+	/* Note highlight animation during playback */
+	.preview-content :global(.verovio-highlight) {
+		fill: #ff6b35 !important;
+		stroke: #ff6b35 !important;
+		stroke-width: 1px;
+		filter: drop-shadow(0 0 3px #ff6b35);
+		transition: fill 0.05s ease, stroke 0.05s ease;
 	}
 </style>
