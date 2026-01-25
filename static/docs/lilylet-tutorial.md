@@ -6,23 +6,24 @@ A comprehensive guide to writing music notation with Lilylet, a simplified music
 
 1. [Introduction](#introduction)
 2. [Basic Notes](#basic-notes)
-3. [Rhythms and Durations](#rhythms-and-durations)
-4. [Rests](#rests)
-5. [Accidentals](#accidentals)
-6. [Octaves](#octaves)
-7. [Key and Time Signatures](#key-and-time-signatures)
-8. [Chords](#chords)
-9. [Articulations](#articulations)
-10. [Dynamics](#dynamics)
-11. [Slurs, Ties, and Beams](#slurs-ties-and-beams)
-12. [Ornaments](#ornaments)
-13. [Grace Notes](#grace-notes)
-14. [Tuplets](#tuplets)
-15. [Tremolo](#tremolo)
-16. [Multiple Voices](#multiple-voices)
-17. [Multiple Staves](#multiple-staves)
-18. [Advanced Features](#advanced-features)
-19. [Complete Examples](#complete-examples)
+3. [Relative Pitch and Line Breaks](#relative-pitch-and-line-breaks)
+4. [Rhythms and Durations](#rhythms-and-durations)
+5. [Rests](#rests)
+6. [Accidentals](#accidentals)
+7. [Octaves](#octaves)
+8. [Key and Time Signatures](#key-and-time-signatures)
+9. [Chords](#chords)
+10. [Articulations](#articulations)
+11. [Dynamics](#dynamics)
+12. [Slurs, Ties, and Beams](#slurs-ties-and-beams)
+13. [Ornaments](#ornaments)
+14. [Grace Notes](#grace-notes)
+15. [Tuplets](#tuplets)
+16. [Tremolo](#tremolo)
+17. [Multiple Voices](#multiple-voices)
+18. [Multiple Staves](#multiple-staves)
+19. [Advanced Features](#advanced-features)
+20. [Complete Examples](#complete-examples)
 
 ---
 
@@ -35,6 +36,7 @@ Lilylet is a text-based music notation language designed for quick and intuitive
 - Relative pitch mode (notes are relative to the previous note)
 - Support for common music notation elements
 - Renders to standard music notation via MEI/Verovio
+- LilyPond-compatible commands (`\time`, `\key`, `\clef`, dynamics, articulations, etc.)
 
 **Your First Score:**
 
@@ -67,12 +69,83 @@ Lilylet uses the standard note letter names:
 
 ```lilylet
 \time 4/4
-c4 d e f | g a b c'
+c4 d e f | g a b c
 ```
 
-### Case Insensitivity
+---
 
-Note names are case-insensitive: `C`, `c`, `D`, `d` all work the same.
+## Relative Pitch and Line Breaks
+
+Understanding how Lilylet handles pitch across measures and line breaks is essential for writing correct music notation.
+
+### Pitch Base
+
+The pitch base (reference point for relative pitch calculation) starts at **middle C** (C4). Each subsequent note is calculated relative to the previous note.
+
+### Continuous Pitch Across Measures
+
+When notes are on the **same line** (no line breaks), the pitch remains continuous across bar lines. This is ideal for writing scales and melodies that span multiple measures:
+
+**Example - Ascending Scale (Single Line):**
+
+```lilylet
+\time 4/4
+c4 d e f | g a b c | d e f g | a b c b | a g f e | d c b a | g f e d | c1
+```
+
+Notice how the pitch naturally ascends and descends across all measures because everything is on one line.
+
+### Line Breaks Reset Pitch (Lilylet-specific)
+
+When you insert a **line break** (newline character), the pitch base resets to **middle C**. This behavior is unique to Lilylet and differs from standard LilyPond. It is useful for:
+
+- Starting a new phrase from a known reference point
+- Writing music where each line represents an independent musical idea
+- Avoiding complex octave calculations
+
+**Example - With Line Break (Pitch Resets):**
+
+```lilylet
+\time 4/4
+c4 d e f | g a b c
+c4 d e f | g a b c
+```
+
+Each line starts fresh from middle C, so both lines produce the same ascending pattern.
+
+### Comparing Behaviors
+
+**Without line break** - continuous pitch:
+```lilylet
+\time 4/4
+c4 d e f | g a b c' | c' b a g | f e d c
+```
+
+**With line break** - pitch resets at each line:
+```lilylet
+\time 4/4
+c4 d e f | g a b c'
+c' b a g | f e d c
+```
+
+In the second example, the newline resets the reference pitch to middle C, so `c'` is explicitly needed on line 2 to place it in the higher octave.
+
+### Practical Tips
+
+1. **For continuous melodies**: Write on a single line to maintain pitch continuity across measures
+2. **For independent phrases**: Use line breaks to reset the pitch base
+3. **For readability**: You can use line breaks for visual organization, but remember that pitch will reset
+4. **For complex passages**: Consider using explicit octave markers (`'` or `,`) when crossing line breaks
+
+**Example - Multi-line with Explicit Octaves:**
+
+```lilylet
+\time 4/4
+c4 d e f | g a b c'
+d'4 e' f' g' | a' b' c'' d''
+```
+
+The second line starts `d'` with an explicit octave marker because the line break reset the pitch base to middle C.
 
 ---
 
@@ -210,10 +283,11 @@ e4 fs g a | b cs' ds' e' | e' ds' cs' b | a g fs e
 
 ### Relative Pitch Mode
 
-Lilylet uses **relative pitch mode**. Each note is interpreted relative to the previous note:
+Lilylet uses **relative pitch mode**. Each note is interpreted relative to the previous note, choosing the **closest pitch** by default:
 
-- If the interval is a **fourth or less**, the note stays in the same octave (or nearest)
-- If the interval is a **fifth or more**, octave markers may be needed
+- Notes within a **fourth** of the previous note stay in the expected octave
+- For **fifths or larger intervals**, Lilylet may choose an unexpected octave
+- Use `'` or `,` markers to force the correct octave when needed
 
 ### Octave Markers
 
@@ -236,7 +310,7 @@ c4 c' c'' c''' | c,, c, c c'
 c4 d e f | g a b c' | c' b a g | f e d c
 ```
 
-Notice `c'` at the end of measure 2 - this is needed because from `b` up to `c` would go down (closer), so we use `c'` to go up.
+Notice `c'` at the end of measure 2 - this is needed because from `b` the closest `c` would be down a seventh rather than up a semitone, so we use `c'` to explicitly go up.
 
 **Example - Wide Intervals:**
 
@@ -372,32 +446,40 @@ The duration applies to the entire chord:
 
 ### Common Articulations
 
-| Notation | Name | Symbol |
-|----------|------|--------|
-| `\staccato` or `.` | Staccato | Dot |
-| `\tenuto` or `_` | Tenuto | Line |
-| `\accent` or `>` | Accent | > |
-| `\marcato` or `^` | Marcato | ^ |
-| `\staccatissimo` or `!` | Staccatissimo | Wedge |
-| `\portato` | Portato | Line + dot |
+Lilylet supports both LilyPond-style commands and shorthand notation:
 
-**Example - Staccato:**
+| Command | Shorthand | Name | Symbol |
+|---------|-----------|------|--------|
+| `\staccato` | `-.` or `.` | Staccato | Dot |
+| `\tenuto` | `--` or `-` | Tenuto | Line |
+| `\accent` | `->` or `>` | Accent | > |
+| `\marcato` | `-^` or `^` | Marcato | ^ |
+| `\staccatissimo` | `-!` or `!` | Staccatissimo | Wedge |
+| `\portato` | `-_` or `_` | Portato | Line + dot |
+
+**Important:** The dot (`.`) has two meanings depending on position:
+- After a **duration number** (e.g., `c4.`) = dotted rhythm
+- After a **note without duration** or at end (e.g., `c4-.` or `c.`) = staccato articulation
+
+**Example - Staccato with explicit syntax:**
 
 ```lilylet
 \time 4/4
-c4. d. e. f. | g4. a. b. c'.
+c4-. d-. e-. f-. | g4\staccato a\staccato b\staccato c'\staccato
 ```
 
 **Example - Mixed Articulations:**
 
 ```lilylet
 \time 4/4
-c4\staccato d\tenuto e\accent f\marcato | g4. a_ b> c'^
+c4\staccato d\tenuto e\accent f\marcato | g4-. a-- b-> c'-^
 ```
 
 ### Placement (Above/Below)
 
-Use `^` for above, `_` for below:
+Use `^` or `_` before an articulation mark to force placement:
+- `^` places the mark above the note
+- `_` places the mark below the note
 
 ```lilylet
 \time 4/4
@@ -814,7 +896,8 @@ c'8\< d'4 e'8 f'4 g' | a'\ff\> g'8 f'~ f'4\p r
 `<c e g>4` - C major chord, quarter note
 
 ### Articulations
-`.` staccato, `_` tenuto, `>` accent, `^` marcato
+`-.` staccato, `--` tenuto, `->` accent, `-^` marcato, `-!` staccatissimo
+Or use commands: `\staccato`, `\tenuto`, `\accent`, `\marcato`, `\staccatissimo`
 
 ### Dynamics
 `\pp \p \mp \mf \f \ff`
