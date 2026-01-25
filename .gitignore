@@ -26,3 +26,6 @@ npm-debug.log*
 
 # Cache
 .cache/
+
+# Generated docs (built in CI)
+static/docs/*.html
