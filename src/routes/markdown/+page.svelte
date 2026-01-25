@@ -16,13 +16,13 @@ This demonstrates embedding **Lilylet music notation** in Markdown documents.
 \\key c \\major
 \\time 4/4
 
-c'4 d' e' f' | g' a' b' c'' | c''1
+c4 d e f | g' a b c | c'1
 \`\`\`
 
 ## Chord Progression
 
 \`\`\`lyl
-<c' e' g'>2 <d' f' a'>2 | <e' g' b'>2 <f' a' c''>2 | <g' b' d''>1
+<c e g>2 <d f a>2 | <e g b>2 <f a c>2 | <g' b d>1
 \`\`\`
 
 ## Mixed Content
@@ -31,7 +31,7 @@ Here's some regular text with inline \`code\` and a music example:
 
 \`\`\`lilylet
 \\time 3/4
-d'4 g' b' | d''2.
+d'4 g b | d''2.
 \`\`\`
 
 And we can continue with more markdown content...
