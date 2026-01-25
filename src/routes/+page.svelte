@@ -110,6 +110,10 @@
 <div class="app">
 	<header>
 		<h1>Lilylet Live Editor</h1>
+		<nav>
+			<span class="current">Editor</span>
+			<a href="/markdown">Markdown Demo</a>
+		</nav>
 		<div class="header-actions">
 			<button class="share-btn" on:click={handleShare}>
 				{#if shareStatus === 'copied'}
@@ -175,6 +179,27 @@
 		font-size: 18px;
 		font-weight: 600;
 		color: #ffffff;
+	}
+
+	nav {
+		display: flex;
+		gap: 16px;
+	}
+
+	nav a {
+		color: #858585;
+		text-decoration: none;
+		font-size: 14px;
+	}
+
+	nav a:hover {
+		color: #d4d4d4;
+	}
+
+	nav .current {
+		color: #0e639c;
+		font-weight: 600;
+		font-size: 14px;
 	}
 
 	.header-actions {
