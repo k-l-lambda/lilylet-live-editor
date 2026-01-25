@@ -4,6 +4,7 @@
 	import MarkdownIt from 'markdown-it';
 	import lilyletPlugin from '@k-l-lambda/lilylet-markdown';
 	import { initVerovio, getToolkit } from '$lib/verovio/toolkit';
+	import { lilyletToMEI } from '$lib/lilylet';
 
 	let markdownInput = `# Lilylet in Markdown Demo
 
@@ -71,10 +72,18 @@ console.log('Hello, Lilylet!');
 		const placeholders = container.querySelectorAll('[data-lilylet-pending]');
 
 		for (const el of placeholders) {
-			const mei = el.getAttribute('data-mei');
-			if (!mei) continue;
+			// Get source code from data-source attribute
+			const source = el.getAttribute('data-source');
+			if (!source) continue;
 
 			try {
+				// Parse lilylet code to MEI
+				const mei = await lilyletToMEI(source);
+				if (!mei) {
+					el.innerHTML = `<pre class="error">Failed to parse lilylet code</pre>`;
+					continue;
+				}
+
 				toolkit.setOptions({
 					scale: 40,
 					adjustPageHeight: true,
