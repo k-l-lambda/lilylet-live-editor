@@ -1,42 +1,64 @@
 #!/usr/bin/env node
 /**
  * Build documentation - converts markdown files to styled HTML
+ * with rendered Lilylet sheet music examples
  */
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import MarkdownIt from 'markdown-it';
+import { parseCode, meiEncoder } from '@k-l-lambda/lilylet';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
-// Initialize markdown-it with syntax highlighting support
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  typographer: true
-});
+// Initialize Verovio
+async function initVerovio() {
+  const verovioModule = await import('verovio');
+  const verovio = verovioModule.default;
+  return new Promise((resolve) => {
+    verovio.module.onRuntimeInitialized = () => {
+      const toolkit = new verovio.toolkit();
+      toolkit.setOptions({
+        scale: 35,
+        adjustPageHeight: true,
+        pageWidth: 1800,
+        pageMarginLeft: 20,
+        pageMarginRight: 20,
+        pageMarginTop: 20,
+        pageMarginBottom: 20,
+      });
+      resolve(toolkit);
+    };
+  });
+}
 
-// Custom renderer for code blocks with lilylet syntax highlighting
-const defaultFence = md.renderer.rules.fence;
-md.renderer.rules.fence = (tokens, idx, options, env, self) => {
-  const token = tokens[idx];
-  const info = token.info.trim();
-  const content = token.content;
+// Escape HTML special characters
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
 
-  // Check if it's a lilylet code block
-  if (info === 'lilylet' || info === 'lyl') {
-    const escaped = content
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-    return `<pre class="lilylet-code"><code class="language-lilylet">${escaped}</code></pre>`;
+// Render lilylet code to SVG
+async function renderLilyletToSvg(code, toolkit) {
+  try {
+    const doc = await parseCode(code);
+    const mei = meiEncoder.encode(doc);
+    const loaded = toolkit.loadData(mei);
+    if (!loaded) {
+      return null;
+    }
+    return toolkit.renderToSVG(1);
+  } catch (error) {
+    console.error(`  Warning: Failed to render lilylet: ${error.message}`);
+    return null;
   }
-
-  return defaultFence(tokens, idx, options, env, self);
-};
+}
 
 // HTML template with styling
 const htmlTemplate = (title, content) => `<!DOCTYPE html>
@@ -178,6 +200,49 @@ const htmlTemplate = (title, content) => `<!DOCTYPE html>
       line-height: 1.5;
     }
 
+    /* Lilylet example container - code + rendered music */
+    .lilylet-example {
+      margin: 1.2em 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .lilylet-example .lilylet-code {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border-left: 4px solid var(--accent);
+      margin: 0;
+      border: none;
+      border-radius: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .lilylet-example .lilylet-code code {
+      color: #e0e0e0;
+    }
+
+    .lilylet-example .lilylet-render {
+      background: #ffffff;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 80px;
+    }
+
+    .lilylet-example .lilylet-render svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .lilylet-example .lilylet-error {
+      background: #2d1a1a;
+      color: #ff6b6b;
+      padding: 12px 16px;
+      font-size: 0.9em;
+    }
+
+    /* Standalone code blocks (non-lilylet) */
     pre.lilylet-code {
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       border-left: 4px solid var(--accent);
@@ -253,11 +318,6 @@ const htmlTemplate = (title, content) => `<!DOCTYPE html>
       margin: 0.4em 0;
     }
 
-    /* Quick reference card styling */
-    h3:contains("Quick Reference") + * {
-      background: var(--bg-tertiary);
-    }
-
     /* Responsive design */
     @media (max-width: 768px) {
       .container {
@@ -283,6 +343,10 @@ const htmlTemplate = (title, content) => `<!DOCTYPE html>
       th, td {
         padding: 8px 10px;
       }
+
+      .lilylet-example .lilylet-render {
+        padding: 10px;
+      }
     }
 
     /* Print styles */
@@ -301,6 +365,10 @@ const htmlTemplate = (title, content) => `<!DOCTYPE html>
         border: 1px solid #ddd;
       }
 
+      .lilylet-example .lilylet-code {
+        background: #f0f0f5;
+      }
+
       a {
         color: #0066cc;
       }
@@ -313,7 +381,7 @@ const htmlTemplate = (title, content) => `<!DOCTYPE html>
       <a href="/lilylet-live-editor/" class="brand">Lilylet</a>
       <a href="/lilylet-live-editor/">Editor</a>
       <a href="/lilylet-live-editor/markdown">Markdown Demo</a>
-      <a href="/lilylet-live-editor/docs/tutorial.html">Tutorial</a>
+      <a href="/lilylet-live-editor/docs/lilylet-tutorial.html">Tutorial</a>
     </nav>
   </header>
   <div class="container">
@@ -323,7 +391,44 @@ const htmlTemplate = (title, content) => `<!DOCTYPE html>
 </html>`;
 
 // Process markdown files
-function buildDocs() {
+async function buildDocs() {
+  console.log('Initializing Verovio...');
+  const toolkit = await initVerovio();
+  console.log('Verovio initialized.\n');
+
+  // Initialize markdown-it
+  const md = new MarkdownIt({
+    html: true,
+    linkify: true,
+    typographer: true
+  });
+
+  // Custom renderer for lilylet code blocks - renders both code and music
+  const defaultFence = md.renderer.rules.fence;
+  md.renderer.rules.fence = (tokens, idx, options, env, self) => {
+    const token = tokens[idx];
+    const info = token.info.trim();
+    const content = token.content.trim();
+
+    // Check if it's a lilylet code block
+    if (info === 'lilylet' || info === 'lyl') {
+      const escaped = escapeHtml(content);
+      const codeBlock = `<pre class="lilylet-code"><code class="language-lilylet">${escaped}</code></pre>`;
+
+      // Get pre-rendered SVG from env
+      const svg = env.lilyletRenderings?.[content];
+
+      if (svg) {
+        return `<div class="lilylet-example">${codeBlock}<div class="lilylet-render">${svg}</div></div>`;
+      } else {
+        // Fallback: just show code if rendering failed
+        return `<div class="lilylet-example">${codeBlock}<div class="lilylet-error">Unable to render notation</div></div>`;
+      }
+    }
+
+    return defaultFence(tokens, idx, options, env, self);
+  };
+
   const docsDir = path.join(rootDir, 'static', 'docs');
   const outputDir = path.join(rootDir, 'static', 'docs');
 
@@ -349,8 +454,32 @@ function buildDocs() {
     const titleMatch = mdContent.match(/^#\s+(.+)$/m);
     const title = titleMatch ? titleMatch[1] : 'Documentation';
 
-    // Convert to HTML
-    const htmlContent = md.render(mdContent);
+    // Pre-render all lilylet blocks
+    console.log('  Pre-rendering lilylet examples...');
+    const tokens = md.parse(mdContent, {});
+    const lilyletRenderings = {};
+    let renderCount = 0;
+
+    for (const token of tokens) {
+      if (token.type === 'fence') {
+        const info = token.info.trim();
+        if (info === 'lilylet' || info === 'lyl') {
+          const code = token.content.trim();
+          if (!lilyletRenderings[code]) {
+            const svg = await renderLilyletToSvg(code, toolkit);
+            if (svg) {
+              lilyletRenderings[code] = svg;
+              renderCount++;
+            }
+          }
+        }
+      }
+    }
+    console.log(`  Rendered ${renderCount} music examples.`);
+
+    // Convert to HTML with pre-rendered SVGs
+    const env = { lilyletRenderings };
+    const htmlContent = md.render(mdContent, env);
 
     // Generate full HTML page
     const fullHtml = htmlTemplate(title, htmlContent);
@@ -381,4 +510,7 @@ function buildDocs() {
   console.log('\nDocs build complete!');
 }
 
-buildDocs();
+buildDocs().catch(err => {
+  console.error('Build failed:', err);
+  process.exit(1);
+});
