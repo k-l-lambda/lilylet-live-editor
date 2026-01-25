@@ -50,6 +50,8 @@ console.log('Hello, Lilylet!');
 	let renderedHtml = '';
 	let verovioReady = false;
 	let md: MarkdownIt;
+	let renderVersion = 0;
+	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 	function renderMarkdown() {
 		if (!md) return;
@@ -57,11 +59,19 @@ console.log('Hello, Lilylet!');
 
 		// After rendering, process lilylet placeholders with Verovio
 		if (browser && verovioReady) {
-			setTimeout(renderLilyletBlocks, 0);
+			renderVersion++;
+			setTimeout(() => renderLilyletBlocks(renderVersion), 0);
 		}
 	}
 
-	async function renderLilyletBlocks() {
+	function debouncedRender() {
+		if (debounceTimer) clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(() => {
+			renderMarkdown();
+		}, 300);
+	}
+
+	async function renderLilyletBlocks(version: number) {
 		const toolkit = getToolkit();
 		if (!toolkit) return;
 
@@ -72,6 +82,9 @@ console.log('Hello, Lilylet!');
 		const placeholders = container.querySelectorAll('[data-lilylet-pending]');
 
 		for (const el of placeholders) {
+			// Check if this render is still current
+			if (version !== renderVersion) return;
+
 			// Get source code from data-source attribute
 			const source = el.getAttribute('data-source');
 			if (!source) continue;
@@ -79,6 +92,10 @@ console.log('Hello, Lilylet!');
 			try {
 				// Parse lilylet code to MEI
 				const mei = await lilyletToMEI(source);
+
+				// Check again after async operation
+				if (version !== renderVersion) return;
+
 				if (!mei) {
 					el.innerHTML = `<pre class="error">Failed to parse lilylet code</pre>`;
 					continue;
@@ -99,7 +116,9 @@ console.log('Hello, Lilylet!');
 				}
 			} catch (err) {
 				console.error('Failed to render lilylet block:', err);
-				el.innerHTML = `<pre class="error">Error: ${err}</pre>`;
+				if (version === renderVersion) {
+					el.innerHTML = `<pre class="error">Error: ${err}</pre>`;
+				}
 			}
 		}
 	}
@@ -123,14 +142,16 @@ console.log('Hello, Lilylet!');
 			await initVerovio();
 			verovioReady = true;
 			// Re-render with Verovio
-			renderLilyletBlocks();
+			renderVersion++;
+			renderLilyletBlocks(renderVersion);
 		} catch (err) {
 			console.error('Failed to initialize Verovio:', err);
 		}
 	});
 
-	$: if (browser && md) {
-		renderMarkdown();
+	// Reactive rendering when markdown input changes
+	$: if (browser && md && markdownInput !== undefined) {
+		debouncedRender();
 	}
 </script>
 
