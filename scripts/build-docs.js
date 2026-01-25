@@ -129,6 +129,10 @@ const htmlTemplate = (title, content) => `<!DOCTYPE html>
       color: var(--text-primary);
     }
 
+    header a.active {
+      color: var(--link);
+    }
+
     header .brand {
       font-weight: 600;
       color: var(--text-primary);
@@ -379,9 +383,8 @@ const htmlTemplate = (title, content) => `<!DOCTYPE html>
   <header>
     <nav>
       <a href="/lilylet-live-editor/" class="brand">Lilylet</a>
-      <a href="/lilylet-live-editor/">Editor</a>
       <a href="/lilylet-live-editor/markdown">Markdown Demo</a>
-      <a href="/lilylet-live-editor/docs/lilylet-tutorial.html">Tutorial</a>
+      <a href="/lilylet-live-editor/docs/lilylet-tutorial.html" class="active">Tutorial</a>
     </nav>
   </header>
   <div class="container">
