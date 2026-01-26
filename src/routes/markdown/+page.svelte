@@ -31,9 +31,17 @@ c4 d e f | g a b c | <c e g>2 <g, b d>2 | c1
 ## Another Playable
 
 \`\`\`lilylet.play
-\\time 3/4
-\\key g \\major
-g4 a b | d'2. | b4 a g | g2.
+\\staff "1" \\key g \\major \\time 3/4 \\clef "treble" \\stemDown d'4(\\p \\stemUp g,8[ a b c] \\\\
+\\staff "2" \\clef "bass" \\stemDown <g b d>2( a4 | %1
+
+\\staff "1" \\stemDown \\clef "treble" d'4) \\stemUp g, g \\\\
+\\staff "2" \\clef "bass" \\stemDown b2.) | %2
+
+\\staff "1" \\stemDown \\clef "treble" e'4( c8[ d e fs] \\\\
+\\staff "2" \\clef "bass" \\stemDown c2.( | %3
+
+\\staff "1" \\clef "treble" \\stemDown g''4) \\stemUp g, g \\\\
+\\staff "2" \\clef "bass" \\stemDown b2.) | %4
 \`\`\`
 
 ## Regular Code Block
@@ -45,7 +53,6 @@ console.log('Hello, Lilylet!');
 
 	// Music widgets (loaded dynamically)
 	let MIDI: any;
-	let MidiPlayer: any;
 	let MusicNotation: any;
 	let MidiAudio: any;
 	let isAudioLoaded = false;
@@ -120,7 +127,6 @@ console.log('Hello, Lilylet!');
 		try {
 			const musicWidgets = await loadMusicWidgets();
 			MIDI = musicWidgets.MIDI;
-			MidiPlayer = musicWidgets.MidiPlayer;
 			MusicNotation = musicWidgets.MusicNotation;
 			MidiAudio = musicWidgets.MidiAudio;
 
@@ -546,7 +552,7 @@ console.log('Hello, Lilylet!');
 
 	onDestroy(() => {
 		// Stop all players and clean up
-		blockPlayers.forEach((player, blockId) => {
+		blockPlayers.forEach((_player, blockId) => {
 			stopBlock(blockId);
 		});
 		blockPlayers.clear();
