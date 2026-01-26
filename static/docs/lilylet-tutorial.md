@@ -5,25 +5,23 @@ A comprehensive guide to writing music notation with Lilylet, a simplified music
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Basic Notes](#basic-notes)
-3. [Relative Pitch and Line Breaks](#relative-pitch-and-line-breaks)
-4. [Rhythms and Durations](#rhythms-and-durations)
-5. [Rests](#rests)
-6. [Accidentals](#accidentals)
-7. [Octaves](#octaves)
-8. [Key and Time Signatures](#key-and-time-signatures)
-9. [Chords](#chords)
-10. [Articulations](#articulations)
-11. [Dynamics](#dynamics)
-12. [Slurs, Ties, and Beams](#slurs-ties-and-beams)
-13. [Ornaments](#ornaments)
-14. [Grace Notes](#grace-notes)
-15. [Tuplets](#tuplets)
-16. [Tremolo](#tremolo)
-17. [Multiple Voices](#multiple-voices)
-18. [Multiple Staves](#multiple-staves)
-19. [Advanced Features](#advanced-features)
-20. [Complete Examples](#complete-examples)
+2. [Writing Pitches](#writing-pitches)
+3. [Rhythms and Durations](#rhythms-and-durations)
+4. [Rests](#rests)
+5. [Accidentals](#accidentals)
+6. [Key and Time Signatures](#key-and-time-signatures)
+7. [Chords](#chords)
+8. [Articulations](#articulations)
+9. [Dynamics](#dynamics)
+10. [Slurs, Ties, and Beams](#slurs-ties-and-beams)
+11. [Ornaments](#ornaments)
+12. [Grace Notes](#grace-notes)
+13. [Tuplets](#tuplets)
+14. [Tremolo](#tremolo)
+15. [Multiple Voices](#multiple-voices)
+16. [Multiple Staves](#multiple-staves)
+17. [Advanced Features](#advanced-features)
+18. [Complete Examples](#complete-examples)
 
 ---
 
@@ -49,21 +47,11 @@ This creates a simple melody in C major with quarter notes, half notes, and a wh
 
 ---
 
-## Basic Notes
+## Writing Pitches
 
 ### Note Names
 
-Lilylet uses the standard note letter names:
-
-| Letter | Note |
-|--------|------|
-| c | C (Do) |
-| d | D (Re) |
-| e | E (Mi) |
-| f | F (Fa) |
-| g | G (Sol) |
-| a | A (La) |
-| b | B (Ti) |
+Lilylet uses lower letters a-g to denote pitches:
 
 **Example - C Major Scale:**
 
@@ -72,80 +60,88 @@ Lilylet uses the standard note letter names:
 c4 d e f | g a b c
 ```
 
----
+### Relative Pitch Mode
 
-## Relative Pitch and Line Breaks
+Lilylet always uses relative pitch (like LilyPond). If a note has no octave marker, its octave is chosen so the interval from the previous note is less than a fifth.
+The reference pitch is middle C (C4); each note is interpreted relative to the previous one.
 
-Understanding how Lilylet handles pitch across measures and line breaks is essential for writing correct music notation.
+**Example - How Relative Mode Works:**
 
-### Pitch Base
-
-The pitch base (reference point for relative pitch calculation) starts at **middle C** (C4). Each subsequent note is calculated relative to the previous note.
-
-### Continuous Pitch Across Measures
-
-When notes are on the **same line** (no line breaks), the pitch remains continuous across bar lines. This is ideal for writing scales and melodies that span multiple measures:
-
-**Example - Ascending Scale (Single Line):**
-
-```lilylet
-\time 4/4
-c4 d e f | g a b c | d e f g | a b c b | a g f e | d c b a | g f e d | c1
-```
-
-Notice how the pitch naturally ascends and descends across all measures because everything is on one line.
-
-### Line Breaks Reset Pitch (Lilylet-specific)
-
-When you insert a **line break** (newline character), the pitch base resets to **middle C**. This behavior is unique to Lilylet and differs from standard LilyPond. It is useful for:
-
-- Starting a new phrase from a known reference point
-- Writing music where each line represents an independent musical idea
-- Avoiding complex octave calculations
-
-**Example - With Line Break (Pitch Resets):**
-
-```lilylet
-\time 4/4
-c4 d e f | g a b c
-c4 d e f | g a b c
-```
-
-Each line starts fresh from middle C, so both lines produce the same ascending pattern.
-
-### Comparing Behaviors
-
-**Without line break** - continuous pitch:
 ```lilylet
 \time 4/4
 c4 d e f | g a b c | c b a g | f e d c
 ```
 
-**With line break** - pitch resets at each line:
-```lilylet
-\time 4/4
-c4 d e f | g a b c
-c' b a g | f e d c
-```
+In this example:
+- `c d e f` - each note is a second above the previous, staying in the same octave
+- `f` to `g` - a second up
+- `g a b c` - continues ascending; from `b` to `c` is a second up, so we reach C5
+- `c b a g` - descending by seconds from C5
+- `f e d c` - continues descending back to middle C
 
-In the second example, the newline resets the reference pitch to middle C, so `c'` is explicitly needed on line 2 to start from C5 (since without the marker, `c` would be middle C).
-
-### Practical Tips
-
-1. **For continuous melodies**: Write on a single line to maintain pitch continuity across measures
-2. **For independent phrases**: Use line breaks to reset the pitch base
-3. **For readability**: You can use line breaks for visual organization, but remember that pitch will reset
-4. **For complex passages**: Consider using explicit octave markers (`'` or `,`) when crossing line breaks
-
-**Example - Multi-line with Explicit Octaves:**
+**Example - Why Fifths Matter:**
 
 ```lilylet
 \time 4/4
-c4 d e f | g a b c
-c'4 d e f | g a b c
+c4 g c g | c e g c
 ```
 
-Each line starts with an explicit octave marker (`c'` on line 2) because the line break reset the pitch base to middle C. Subsequent notes flow naturally from there.
+From middle C, writing `g` gives the G *below* (a fourth down), not the G above (which would be a fifth up). The rule keeps intervals small.
+
+### Octave Markers
+
+When you need to jump more than a fourth, use octave markers:
+
+| Marker | Effect |
+|--------|--------|
+| `'` (apostrophe) | Raise one octave |
+| `,` (comma) | Lower one octave |
+
+**Example - Using Octave Markers:**
+
+```lilylet
+\time 4/4
+c4 c' c' c' | c,,, c'' c, c'
+```
+
+**Example - Wide Leaps:**
+
+```lilylet
+\time 4/4
+c4 g' c g, | c' e g c
+```
+
+Here `g'` explicitly jumps up a fifth, and `g,` explicitly drops down.
+
+### Line Breaks Reset Pitch
+
+Different from lilypond, when you insert a **line break** (newline character), the pitch base resets to **middle C**. This is unique to Lilylet:
+
+```lilylet
+\time 4/4
+c4 d e f | g a b c
+c4 d e f | g a b c
+```
+
+Both lines produce the same ascending pattern because each starts fresh from middle C.
+
+**With explicit octave on second line:**
+
+```lilylet
+\time 4/4
+c4 d e f | g a b c |
+c'4 b a g | f e d c |
+```
+
+The `c'` on line 2 starts from C5 (since the line break reset to middle C, we need `'` to reach C5).
+
+#### Why we import this discrimination from lilypond?
+
+Unlike LilyPond’s typical workflow of writing an entire voice from start to finish,
+Lilylet favors interleaved, measure‑by‑measure voice entry: write all voices for a measure before advancing to the next.
+This makes multi‑voice alignment and live editing simpler and ensures relative‑pitch decisions (octave choice, small‑interval preference) are resolved locally within each measure.
+Long, continuous monophonic lines remain supported but are primarily useful for educational examples;
+in practical Lilylet usage, prefer short, interleaved voice segments for clearer notation and more predictable rendering.
 
 ---
 
@@ -275,48 +271,6 @@ c4 css d dff | e1
 \key e \minor
 \time 4/4
 e4 fs g a | b cs ds e | e ds cs b | a g fs e
-```
-
----
-
-## Octaves
-
-### Relative Pitch Mode
-
-Lilylet uses **relative pitch mode**. Each note is interpreted relative to the previous note, choosing the **closest pitch** by default:
-
-- Notes within a **fourth** of the previous note stay in the expected octave
-- For **fifths or larger intervals**, Lilylet may choose an unexpected octave
-- Use `'` or `,` markers to force the correct octave when needed
-
-### Octave Markers
-
-| Marker | Effect |
-|--------|--------|
-| `'` (apostrophe) | Raise one octave |
-| `,` (comma) | Lower one octave |
-
-**Example - Octave Changes:**
-
-```lilylet
-\time 4/4
-c4 c' c'' c''' | c,, c, c c'
-```
-
-**Example - Understanding Relative Mode:**
-
-```lilylet
-\time 4/4
-c4 d e f | g a b c | c b a g | f e d c
-```
-
-Note: From `b` (B4), the closest `c` is C5 (up a half step), not C4 (down 11 half steps). So `c` after `b` naturally goes up to C5 without needing any octave marker.
-
-**Example - Wide Intervals:**
-
-```lilylet
-\time 4/4
-c4 g c g | c e g c | c g e c
 ```
 
 ---
