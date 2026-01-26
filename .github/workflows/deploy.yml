@@ -35,7 +35,7 @@ jobs:
       - name: Build music-widgets
         run: |
           cd music-widgets
-          npm install
+          npm install --legacy-peer-deps
           npm run build
           # Copy UMD bundle to static folder for direct script loading
           mkdir -p ../static/js
