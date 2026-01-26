@@ -1,12 +1,15 @@
 <script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
 	import { editorStore } from '$lib/stores/editor';
 	import Player from './Player.svelte';
 	import { tick } from 'svelte';
 
 	let svgContainer: HTMLDivElement;
+	let previewContainer: HTMLDivElement;
 	let cursorElement: HTMLDivElement;
 	let cursorStyle = '';
 	let lastRenderedSvg = '';
+	let resizeObserver: ResizeObserver | null = null;
 
 	/**
 	 * Safely inject SVG content using DOMParser.
@@ -115,6 +118,35 @@
 			});
 		}
 	}
+
+	function handleContainerResize() {
+		if (!previewContainer) return;
+		const newWidth = previewContainer.clientWidth;
+		// Only update if significant change (more than 20px)
+		if (Math.abs(newWidth - $editorStore.previewWidth) > 20) {
+			editorStore.setPreviewWidth(newWidth);
+		}
+	}
+
+	onMount(() => {
+		if (previewContainer) {
+			// Set initial width
+			editorStore.setPreviewWidth(previewContainer.clientWidth);
+
+			// Set up ResizeObserver
+			resizeObserver = new ResizeObserver(() => {
+				handleContainerResize();
+			});
+			resizeObserver.observe(previewContainer);
+		}
+	});
+
+	onDestroy(() => {
+		if (resizeObserver) {
+			resizeObserver.disconnect();
+			resizeObserver = null;
+		}
+	});
 </script>
 
 <div class="preview-wrapper">
@@ -137,7 +169,7 @@
 		</div>
 	</div>
 
-	<div class="preview-container">
+	<div class="preview-container" bind:this={previewContainer}>
 		{#if !$editorStore.verovioReady}
 			<div class="loading-container">
 				<div class="loading-spinner">

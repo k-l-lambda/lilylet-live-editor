@@ -11,6 +11,8 @@
 
 	let shareStatus: 'idle' | 'copied' | 'error' = 'idle';
 	let lastRenderedCode = '';
+	let lastRenderedWidth = 0;
+	let resizeDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 	// Render cancellation token to prevent out-of-order updates
 	let currentRenderId = 0;
@@ -18,7 +20,17 @@
 	// Watch for code changes and re-render (only when code actually changes)
 	$: if (browser && $editorStore.verovioReady && $editorStore.code && $editorStore.code !== lastRenderedCode) {
 		lastRenderedCode = $editorStore.code;
+		lastRenderedWidth = $editorStore.previewWidth;
 		renderScore($editorStore.code);
+	}
+
+	// Watch for width changes and re-render with debounce
+	$: if (browser && $editorStore.verovioReady && $editorStore.svg && $editorStore.previewWidth !== lastRenderedWidth) {
+		if (resizeDebounceTimer) clearTimeout(resizeDebounceTimer);
+		resizeDebounceTimer = setTimeout(() => {
+			lastRenderedWidth = $editorStore.previewWidth;
+			renderScore($editorStore.code);
+		}, 150);
 	}
 
 	async function handleShare() {
@@ -61,6 +73,18 @@
 			// Check if this render is still current before updating store
 			if (renderId !== currentRenderId) return;
 			editorStore.setMEI(mei);
+
+			// Calculate pageWidth based on container - account for padding
+			const effectiveWidth = Math.max(400, $editorStore.previewWidth - 80);
+			// Verovio scale 40 means 40% of default size, pageWidth is in abstract units
+			// At scale 40, approximately 2.5 abstract units = 1 pixel
+			const pageWidthUnits = Math.round(effectiveWidth * 2.5);
+
+			toolkit.setOptions({
+				scale: 40,
+				adjustPageHeight: true,
+				pageWidth: pageWidthUnits
+			});
 
 			// Render with Verovio
 			const success = toolkit.loadData(mei);

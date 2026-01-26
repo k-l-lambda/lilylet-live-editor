@@ -83,6 +83,9 @@ console.log('Hello, Lilylet!');
 	let md: MarkdownIt;
 	let renderVersion = 0;
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+	let previewContainer: HTMLElement;
+	let resizeObserver: ResizeObserver | null = null;
+	let containerWidth = 800; // Default width
 
 	function renderMarkdown() {
 		if (!md) return;
@@ -459,6 +462,80 @@ console.log('Hello, Lilylet!');
 		}
 	}
 
+	function handleContainerResize() {
+		if (!previewContainer) return;
+		const newWidth = previewContainer.clientWidth;
+		if (Math.abs(newWidth - containerWidth) > 20) { // Only re-render if significant change
+			containerWidth = newWidth;
+			if (verovioReady) {
+				// Re-render all blocks with new width
+				renderVersion++;
+				reRenderAllBlocks(renderVersion);
+			}
+		}
+	}
+
+	async function reRenderAllBlocks(version: number) {
+		const toolkit = getToolkit();
+		if (!toolkit || !previewContainer) return;
+
+		// Find all already-rendered lilylet blocks
+		const blocks = previewContainer.querySelectorAll('[data-lilylet]');
+
+		for (const el of blocks) {
+			if (version !== renderVersion) return;
+
+			const source = el.getAttribute('data-source');
+			if (!source) continue;
+
+			const isPlayable = el.hasAttribute('data-playable');
+			const blockId = el.querySelector('.mini-player')?.querySelector('.play-btn')?.getAttribute('data-block');
+
+			// Preserve player state if exists
+			const existingPlayer = blockId ? blockPlayers.get(blockId) : null;
+			const wasPlaying = existingPlayer?.isPlaying;
+			const currentTime = existingPlayer?.currentTime || 0;
+
+			if (wasPlaying && blockId) {
+				pauseBlock(blockId);
+			}
+
+			try {
+				const mei = lilyletToMEI(source);
+				if (version !== renderVersion) return;
+				if (!mei) continue;
+
+				const effectiveWidth = Math.max(400, containerWidth - 80);
+				const pageWidthUnits = Math.round(effectiveWidth * 2.5);
+
+				toolkit.setOptions({
+					scale: 40,
+					adjustPageHeight: true,
+					pageWidth: pageWidthUnits
+				});
+
+				const loaded = toolkit.loadData(mei);
+				if (loaded) {
+					const svg = toolkit.renderToSVG(1);
+					// Preserve mini-player if it exists
+					const miniPlayer = el.querySelector('.mini-player');
+					el.innerHTML = svg;
+					if (miniPlayer && isPlayable) {
+						el.appendChild(miniPlayer);
+					}
+
+					// Update player element reference
+					if (existingPlayer) {
+						existingPlayer.element = el as HTMLElement;
+						existingPlayer.mei = mei;
+					}
+				}
+			} catch (err) {
+				console.error('Failed to re-render block:', err);
+			}
+		}
+	}
+
 	async function renderLilyletBlocks(version: number) {
 		const toolkit = getToolkit();
 		if (!toolkit) return;
@@ -493,10 +570,16 @@ console.log('Hello, Lilylet!');
 					continue;
 				}
 
+				// Calculate pageWidth based on container - account for padding and borders
+				const effectiveWidth = Math.max(400, containerWidth - 80); // 80px for padding/margins
+				// Verovio scale 40 means 40% of default size, pageWidth is in abstract units
+				// At scale 40, approximately 2.5 abstract units = 1 pixel
+				const pageWidthUnits = Math.round(effectiveWidth * 2.5);
+
 				toolkit.setOptions({
 					scale: 40,
 					adjustPageHeight: true,
-					pageWidth: 1200
+					pageWidth: pageWidthUnits
 				});
 
 				const loaded = toolkit.loadData(mei);
@@ -534,6 +617,15 @@ console.log('Hello, Lilylet!');
 		// Initial render (without Verovio)
 		renderMarkdown();
 
+		// Set up ResizeObserver for responsive layout
+		if (previewContainer) {
+			containerWidth = previewContainer.clientWidth;
+			resizeObserver = new ResizeObserver(() => {
+				handleContainerResize();
+			});
+			resizeObserver.observe(previewContainer);
+		}
+
 		// Initialize Verovio and audio in parallel
 		try {
 			await Promise.all([
@@ -556,6 +648,12 @@ console.log('Hello, Lilylet!');
 			stopBlock(blockId);
 		});
 		blockPlayers.clear();
+
+		// Clean up ResizeObserver
+		if (resizeObserver) {
+			resizeObserver.disconnect();
+			resizeObserver = null;
+		}
 	});
 
 	// Reactive rendering when markdown input changes
@@ -597,7 +695,7 @@ console.log('Hello, Lilylet!');
 		<div class="divider"></div>
 		<div class="pane preview-pane">
 			<div class="pane-header">Preview</div>
-			<div class="preview-content">
+			<div class="preview-content" bind:this={previewContainer}>
 				{@html renderedHtml}
 			</div>
 		</div>

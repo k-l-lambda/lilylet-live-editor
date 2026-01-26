@@ -9,6 +9,7 @@ export interface EditorState {
 	isRendering: boolean;
 	verovioReady: boolean;
 	cursorElementId: string | null;
+	previewWidth: number;
 }
 
 // Sample Lilylet code demonstrating basic syntax
@@ -23,7 +24,8 @@ c4 d e f | g a b c | <c e g>2 <d f a>2 | c1
 	pageCount: 0,
 	isRendering: false,
 	verovioReady: false,
-	cursorElementId: null
+	cursorElementId: null,
+	previewWidth: 800
 };
 
 function createEditorStore() {
@@ -39,6 +41,7 @@ function createEditorStore() {
 		setRendering: (isRendering: boolean) => update((s) => ({ ...s, isRendering })),
 		setVerovioReady: (verovioReady: boolean) => update((s) => ({ ...s, verovioReady })),
 		setCursorElement: (cursorElementId: string | null) => update((s) => ({ ...s, cursorElementId })),
+		setPreviewWidth: (previewWidth: number) => update((s) => ({ ...s, previewWidth })),
 		reset: () => set(initialState)
 	};
 }
