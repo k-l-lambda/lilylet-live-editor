@@ -39,7 +39,7 @@ jobs:
           npm run build
           # Copy UMD bundle to static folder for direct script loading
           mkdir -p ../static/js
-          cp dist/musicWidgetsBrowser.umd.min.js ../static/js/
+          cp dist/musicWidgetsBrowser.umd.js ../static/js/musicWidgetsBrowser.umd.min.js
 
       - name: Setup npm for GitHub registry
         run: |
