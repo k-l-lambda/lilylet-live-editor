@@ -39,7 +39,7 @@ Lilylet is a text-based music notation language designed for quick and intuitive
 **Your First Score:**
 
 ```lilylet
-\time 4/4
+\time 4/4 \clef "treble"
 c4 d e f | g2 g | a4 a a a | g1
 ```
 
@@ -119,8 +119,8 @@ Different from lilypond, when you insert a **line break** (newline character), t
 
 ```lilylet
 \time 4/4
-c4 d e f | g a b c
-c4 d e f | g a b c
+c4 d e f | g a b c |
+c4 d e f | g a b c |
 ```
 
 Both lines produce the same ascending pattern because each starts fresh from middle C.
@@ -135,7 +135,7 @@ c'4 b a g | f e d c |
 
 The `c'` on line 2 starts from C5 (since the line break reset to middle C, we need `'` to reach C5).
 
-#### Why we import this discrimination from lilypond?
+#### Why we import this discrimination against lilypond?
 
 Unlike LilyPond’s typical workflow of writing an entire voice from start to finish,
 Lilylet favors interleaved, measure‑by‑measure voice entry: write all voices for a measure before advancing to the next.
@@ -165,7 +165,7 @@ Durations are specified by numbers after the note name:
 
 ```lilylet
 \time 4/4
-c1 | c2 c2 | c4 c4 c4 c4 | c8 c8 c8 c8 c8 c8 c8 c8
+g'1 | g2 g2 | g4 g4 g4 g4 | g8 g8 g8 g8 g8 g8 g8 g16 g32 g64 g128 g128\rest |
 ```
 
 ### Duration Persistence
@@ -200,7 +200,7 @@ c4. d4. | e8 e e f4.
 
 ```lilylet
 \time 12/8
-c4. d e f | g4 g8 a4. g
+c2. e | g8. g16 g4.. g16
 ```
 
 ---
@@ -222,7 +222,14 @@ Use `R` for full-measure rests (displayed centered in the measure):
 
 ```lilylet
 \time 4/4
-c4 d e f | R1 | g4 a b c
+R1 | g4 a b c
+```
+
+`R` always displayed as a full rest, but it can has different durations internally:
+
+```lilylet
+\time 3/4
+R2. | c4 d e
 ```
 
 ### Space Rests (Invisible)
@@ -230,8 +237,9 @@ c4 d e f | R1 | g4 a b c
 Use `s` for invisible rests (useful in multi-voice notation):
 
 ```lilylet
-\time 4/4
-c4 s4 e4 s4
+\time 4/4 \clef "bass"
+r4 d b b \\
+s4 g2 e4
 ```
 
 ---
@@ -240,6 +248,7 @@ c4 s4 e4 s4
 
 ### Sharps and Flats
 
+Lilylet use the English dialect of lilypond for pitches and accidentals.
 Add `s` for sharp, `f` for flat after the note name:
 
 | Notation | Meaning |
@@ -270,7 +279,7 @@ c4 css d dff | e1
 ```lilylet
 \key e \minor
 \time 4/4
-e4 fs g a | b cs ds e | e ds cs b | a g fs e
+e4 fs g a | b cs ds e | e d c b | a g fs e
 ```
 
 ---
@@ -382,7 +391,7 @@ Enclose multiple pitches in angle brackets `< >`:
 
 ```lilylet
 \time 4/4
-c8 e g c e g c g | e c g, e, c,4 r
+<cs e a cs>4 \arpeggio <b d g b>2. \arpeggio | <a cs e a>1 \arpeggio
 ```
 
 ### Chord with Different Durations
@@ -539,6 +548,8 @@ c8[ d e f] g[ a b c] | c[ b a g] f4 r
 c8[ d e] f[ g a] | b[ c d] e4.
 ```
 
+**A Note**: the same as the grammar of lilypond, `(`, `)`, `[`, and `]` are used as postfixes on music events, not scope signs.
+
 ---
 
 ## Ornaments
@@ -593,7 +604,7 @@ Use `\grace` before a note or group of notes:
 
 ```lilylet
 \time 4/4
-\grace e16 d4 f a d' | \grace fs16 g4 b d' g'
+\grace e16 d4 f a d | \grace fs16 g4 b d g
 ```
 
 **Example - Multiple Grace Notes:**
@@ -680,7 +691,6 @@ Use `\\` to separate voices on the same staff:
 |---------|--------|
 | `\stemUp` | Force stems up |
 | `\stemDown` | Force stems down |
-| `\stemNeutral` | Automatic |
 
 ---
 
