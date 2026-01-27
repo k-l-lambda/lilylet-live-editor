@@ -674,15 +674,24 @@ Use `\repeat tremolo`:
 Use `\\` to separate voices on the same staff:
 
 ```lilylet
-\time 4/4
-\stemUp c'2 d' \\ \stemDown g2 a | \stemUp e'2 f' \\ \stemDown b2 c'
+\time 4/4 \stemUp c'2 d \\
+\stemDown g2 a | % 1
+
+\stemUp e'2 f \\
+\stemDown b2 c | % 2
 ```
 
 **Example - Two-Voice Counterpoint:**
 
 ```lilylet
-\time 4/4
-\stemUp e'4 d' c' b \\ \stemDown c4 g a e | \stemUp c'2 b \\ \stemDown f2 g | \stemUp c'1 \\ \stemDown c1
+\time 4/4 \stemUp e'4 d c b \\
+\stemDown c4 g a e | % 1
+
+\stemUp c'2 b \\
+\stemDown f2 g | % 2
+
+\stemUp c'1 \\
+\stemDown c1 | % 3
 ```
 
 ### Stem Direction
@@ -696,26 +705,31 @@ Use `\\` to separate voices on the same staff:
 
 ## Multiple Staves
 
-### Part Separator
-
-Use `\\\` (triple backslash) to separate different staves/parts:
-
-```lilylet
-\time 4/4
-\clef "treble" c'4 d' e' f' | g'1 \\\
-\clef "bass" c4 g, c g, | c1
-```
-
 ### Staff Assignment
 
 Use `\staff "N"` to assign notes to a specific staff:
 
 ```lilylet
 \time 4/4
-\staff "1" \clef "treble" c'4 e' g' c'' \\
-\staff "2" \clef "bass" c4 g c' g |
-\staff "1" d'4 f' a' d'' \\
-\staff "2" d4 a d' a
+\staff "1" \clef "treble" c'4 e g c \\
+\staff "2" \clef "bass" c4 g c g | % 1
+
+\staff "1" d'4 f a d \\
+\staff "2" d4 a d a | % 2
+```
+
+### Part Separator
+
+Use `\\\` (triple backslash) to separate different staves/parts:
+
+```lilylet
+\staff "1" \time 4/4 \clef "treble" c'4 d e f \\
+\staff "2" \clef "treble" r4 g' r g \\\
+\clef "bass" <c, g' c>1 ~ | % 1
+
+\staff "1" g'1 \\
+\staff "2" r4 c r c\\\
+<c, g' c>1 | % 2
 ```
 
 ---
