@@ -597,7 +597,7 @@ Use `\grace` before a note or group of notes:
 
 ```lilylet
 \time 4/4
-\grace d16 c4 e g c' | \grace { b,16 c } d4 f a d'
+\grace d16 c4 e g c | \grace { b,16 c } d4 f a d'
 ```
 
 **Example - Appoggiatura Style:**
@@ -728,7 +728,7 @@ Use `\\\` (triple backslash) to separate different staves/parts:
 \clef "bass" <c, g' c>1 ~ | % 1
 
 \staff "1" g'1 \\
-\staff "2" r4 c r c\\\
+\staff "2" r4 c r c \\\
 <c, g' c>1 | % 2
 ```
 
@@ -761,7 +761,7 @@ c4 d e f | \ottava #1 g a b c | d e f g | \ottava #0 a b c d
 
 ```lilylet
 \time 4/4
-c4\sustainOn e g c | e g c g | e c g, e, | c,1\sustainOff
+c4\sustainOn e g c | e g c g | e c g e | c1\sustainOff
 ```
 
 ### Metadata Headers
@@ -772,9 +772,7 @@ Add metadata at the beginning of your score:
 [title "Minuet in G"]
 [composer "J.S. Bach"]
 
-\key g \major
-\time 3/4
-d'4 g8 a b c | b4 a g
+\key g \major \time 3/4 \clef "treble" \stemDown d'4(\p \stemUp g,8[ a b c] | \stemDown d4) \stemUp g, g
 ```
 
 ---
@@ -787,7 +785,7 @@ d'4 g8 a b c | b4 a g
 [title "Twinkle Twinkle"]
 
 \time 4/4
-c4 c g g | a a g2 | f4 f e e | d d c2 | g4 g f f | e e d2 | g4 g f f | e e d2 | c4 c g g | a a g2 | f4 f e e | d d c2
+c4 c g' g | a a g2 | f4 f e e | d d c2 | g'4 g f f | e e d2 | g'4 g f f | e e d2 | c4 c g' g | a a g2 | f4 f e e | d d c2
 ```
 
 ### Example 2: Piano Style with Chords
@@ -797,9 +795,9 @@ c4 c g g | a a g2 | f4 f e e | d d c2 | g4 g f f | e e d2 | g4 g f f | e e d2 | 
 
 \key g \major
 \time 3/4
-\stemUp d'4 g' b' \\ \stemDown <g b>4 <g b> <g b> |
-\stemUp d'4 a' c'' \\ \stemDown <fs a>4 <fs a> <fs a> |
-\stemUp d'4 g' b' \\ \stemDown <g b>4 <g b> <g b> |
+\stemUp d'4 g b \\ \stemDown <g b>4 <g b> <g b> |
+\stemUp d'4 a c' \\ \stemDown <fs a>4 <fs a> <fs a> |
+\stemUp d'4 g b \\ \stemDown <g b>4 <g b> <g b> |
 \stemUp d'2. \\ \stemDown <g b d'>2.
 ```
 
@@ -818,12 +816,17 @@ c4\p( d e f) | g2\< a | b4\mf\> a g f | e2\p d | c4\pp( e g c) | c2.\fermata r4
 [title "Piano Exercise"]
 [composer "Practice"]
 
-\time 4/4
-\staff "1" \clef "treble" \stemUp c'4 e' g' c'' | d''2 c'' \\
-\staff "2" \clef "bass" c4 g c' g | g2 c' |
+\staff "1" \time 4/4 \clef "treble" \stemUp c'4 e g c \\
+\staff "2" \clef "bass" c4 g c g |
 
-\staff "1" b'4 g' e' c' | d'2 c' \\
-\staff "2" g4 e c g, | g,2 c
+\staff "1" d2 c \\
+\staff "2" |
+
+\staff "1" b'4 g e c \\
+\staff "2" g4 e c g |
+
+\staff "1" d2 c \\
+\staff "2" g,2 c |
 ```
 
 ### Example 5: Baroque Style
@@ -833,7 +836,7 @@ c4\p( d e f) | g2\< a | b4\mf\> a g f | e2\p d | c4\pp( e g c) | c2.\fermata r4
 
 \key d \minor
 \time 4/4
-d8[ f a d] f[ a d a] | f[ d a, f,] d,[ f, a, d] | \times 2/3 { e8 g bf } \times 2/3 { e g bf } e4 r | \grace cs16 d4 \grace e16 f4 \grace g16 a2
+d8[ f a d] f[ a d a] | f[ d a, f] d[ f a d] | \times 2/3 { e8 g bf } \times 2/3 { e g bf } e4 r | \ottava #1 \grace cs16 d4 \grace e16 f4 \grace g16 a2 |
 ```
 
 ### Example 6: Modern Rhythms
@@ -844,45 +847,6 @@ d8[ f a d] f[ a d a] | f[ d a, f,] d,[ f, a, d] | \times 2/3 { e8 g bf } \times 
 \time 4/4
 c4. d8~ d4 e | f8 g4 a8~ a4 b | c8\< d4 e8 f4 g | a\ff\> g8 f~ f4\p r
 ```
-
----
-
-## Quick Reference Card
-
-### Notes
-`c d e f g a b` - Note names
-`cs ds es fs gs as bs` - Sharps
-`cf df ef ff gf af bf` - Flats
-
-### Durations
-`1` whole, `2` half, `4` quarter, `8` eighth, `16` sixteenth
-`.` dot, `..` double dot
-
-### Octaves
-`'` up, `,` down
-
-### Measures
-`|` bar line
-
-### Chords
-`<c e g>4` - C major chord, quarter note
-
-### Articulations
-`-.` staccato, `--` tenuto, `->` accent, `-^` marcato, `-!` staccatissimo
-Or use commands: `\staccato`, `\tenuto`, `\accent`, `\marcato`, `\staccatissimo`
-
-### Dynamics
-`\pp \p \mp \mf \f \ff`
-`\<` crescendo, `\>` diminuendo, `\!` end
-
-### Slurs/Ties/Beams
-`(` `)` slurs, `~` tie, `[` `]` beams
-
-### Structure
-`\\` voice separator, `\\\` staff separator
-
-### Commands
-`\key c \major`, `\time 4/4`, `\clef "treble"`, `\tempo "Allegro" 4=120`
 
 ---
 
