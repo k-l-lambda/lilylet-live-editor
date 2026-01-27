@@ -814,19 +814,23 @@ c4\p( d e f) | g2\< a | b4\mf\> a g f | e2\p d | c4\pp( e g c) | c2.\fermata r4
 
 ```lilylet
 [title "Piano Exercise"]
-[composer "Practice"]
+[subtitle "A Practice"]
 
-\staff "1" \time 4/4 \clef "treble" \stemUp c'4 e g c \\
-\staff "2" \clef "bass" c4 g c g |
+\staff "1" \key c \major \time 4/4 \clef "treble" \stemDown c'8([ e g] \stemDown c,[ e g] \stemDown c,[ e g] \stemDown c,[ e g] \\
+\staff "2" \clef "treble" c1 \\
+\staff "2" \clef "treble" c'4\rest \stemUp <e, g> <e g> <e g> | %1
 
-\staff "1" d2 c \\
-\staff "2" |
+\staff "1" \stemDown \clef "treble" c'8[ e g] \stemDown c,[ e g] \stemDown c,[ e g] \stemDown c,[ e g] \\
+\staff "2" \clef "treble" c1 \\
+\staff "2" \clef "treble" \stemUp c'4\rest <e, g> <e g> <e g> | %2
 
-\staff "1" b'4 g e c \\
-\staff "2" g4 e c g |
+\staff "1" \stemDown \clef "treble" d'8[ f g] \stemDown d[ f g] \stemDown d[ f g] \stemDown d[ f g] \\
+\staff "2" \clef "treble" b1 \\
+\staff "2" \clef "treble" \stemUp c'4\rest <d, g> <d g> <d g> | %3
 
-\staff "1" d2 c \\
-\staff "2" g,2 c |
+\staff "1" \stemDown \clef "treble" e'8[ f g] \stemDown f[ e d] \stemDown c2) \\
+\staff "2" \clef "treble" c1 \\
+\staff "2" \clef "treble" \stemUp c'4\rest <e, g> <e g> <e g> | %4
 ```
 
 ### Example 5: Baroque Style
