@@ -74,11 +74,11 @@ c4 d e f | g a b c | c b a g | f e d c
 ### Why "less than a fifth" matters
 
 ```lilylet
-\time 4/4
-c4 g c g | c e g c
+\time 4/4 \clef "C"
+c4 e c f | c g c a
 ```
 
-From middle C, writing `g` selects the nearer G (often the one below, a fourth down) rather than jumping up a fifth. This rule reduces unintended octave jumps.
+From middle C, writing `g` after `c` selects the nearer G (the one below, a fourth down) rather than jumping up a fifth. This rule reduces unintended octave jumps.
 
 ### Octave markers
 
@@ -96,7 +96,7 @@ c4 c' c' c' | c,,, c'' c, c'
 
 ```lilylet
 \time 4/4
-c4 g' c g, | c' e g c
+c4 g' c g | c' g e c
 ```
 
 ### Newlines reset pitch (Lilylet-specific)
@@ -106,7 +106,7 @@ Different from LilyPond: inserting a **line break** (newline) resets the relativ
 ```lilylet
 \time 4/4
 c4 d e f | g a b c |
-c4 d e f | g a b c |
+c4 b a g | f e d c |
 ```
 
 If you want the second line to start higher, specify it explicitly:
@@ -194,7 +194,7 @@ Use `R` for a centered full-measure rest (display style), while duration may var
 
 ```lilylet
 \time 4/4
-R1 | g4 a b c
+R1 | g'4 a b c
 ```
 
 ```lilylet
@@ -208,8 +208,8 @@ Use `s` to reserve rhythmic space without printing a rest (common in multi-voice
 
 ```lilylet
 \time 4/4 \clef "bass"
-r4 d b b \\
-s4 g2 e4
+r4 d, b b \\
+s4 g,2 e4
 ```
 
 ---
@@ -321,7 +321,13 @@ a4 b c d | e f gs a
 ```lilylet
 \clef "bass"
 \time 4/4
-c4 d e f | g a b c'
+c,4 d e f | g a b c
+```
+
+```lilylet
+\clef "alto"
+\time 4/4
+c4 d e f | g a b c
 ```
 
 Supported clefs: `treble`, `bass`, `alto`
@@ -343,12 +349,25 @@ Enclose pitches in angle brackets `< >`:
 
 ```lilylet
 \time 4/4
-<c e g>2 <f, a c> | <g, b d> <c e g> | <c e g>1
+<c e g>2 <f, a c> | <g b d> <c e g> | <c e g>1
 ```
 
 ```lilylet
 \time 4/4
 <cs e a cs>4 \arpeggio <b d g b>2. \arpeggio | <a cs e a>1 \arpeggio
+```
+
+**Note**: only the first pitch in a chord will pass the relative pitch base to next music event. And inside a chord, pitches also follow relative pitch rules.
+
+```
+Example: <c e g>  <d f a>  <e g b>
+
+         Chord 1      Chord 2      Chord 3
+           g            a            b
+           ↓            ↓            ↓
+           e            f            g      (relative to previous pitch in chord)
+           ↓            ↓            ↓
+           c ←───────── d ←───────── e      (relative pitch bass passing by the root pitch in chords)
 ```
 
 ### Chord duration
