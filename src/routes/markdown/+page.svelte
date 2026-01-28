@@ -134,7 +134,7 @@ console.log('Hello, Lilylet!');
 			MidiAudio = musicWidgets.MidiAudio;
 
 			await MidiAudio.loadPlugin({
-				soundfontUrl: 'https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/',
+				soundfontUrl: `${base}/soundfont/`,
 				api: 'webaudio'
 			});
 			isAudioLoaded = true;

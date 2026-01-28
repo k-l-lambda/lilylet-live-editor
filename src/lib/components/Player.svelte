@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
+	import { base } from '$app/paths';
 	import { editorStore } from '$lib/stores/editor';
 	import { getToolkit } from '$lib/verovio/toolkit';
 
@@ -88,7 +89,7 @@
 			MidiAudio = musicWidgets.MidiAudio;
 
 			await MidiAudio.loadPlugin({
-				soundfontUrl: 'https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/',
+				soundfontUrl: `${base}/soundfont/`,
 				api: 'webaudio'
 			});
 			isAudioLoaded = true;
