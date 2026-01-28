@@ -1,4 +1,7 @@
 import { writable, derived, type Writable, type Readable } from 'svelte/store';
+import { browser } from '$app/environment';
+
+const STORAGE_KEY = 'lilylet-editor-code';
 
 export interface EditorState {
 	code: string;
@@ -13,8 +16,7 @@ export interface EditorState {
 }
 
 // Sample Lilylet code demonstrating basic syntax
-const initialState: EditorState = {
-	code: `[title "Jesu, meine Freude"]
+const defaultCode = `[title "Jesu, meine Freude"]
 [subtitle "BWV 610"]
 [composer "J.S. Bach"]
 
@@ -27,7 +29,26 @@ const initialState: EditorState = {
 \\staff "1" \\stemDown c8[ c4 b8] c8.[ \\staff "2" \\stemUp g16] \\staff "1" c[ b c d] \\\\
 \\staff "2" f,16[ ef f d] g[ af g f] ef[ d ef8]~ ef16[ f ef d] \\\\
 \\staff "3" r16 g,[ af f] g[ f g8] c,2 | % 2
-`,
+`;
+
+// Load saved code from localStorage (browser only)
+function loadSavedCode(): string {
+	if (browser) {
+		const saved = localStorage.getItem(STORAGE_KEY);
+		if (saved) return saved;
+	}
+	return defaultCode;
+}
+
+// Save code to localStorage (browser only)
+function saveCode(code: string): void {
+	if (browser) {
+		localStorage.setItem(STORAGE_KEY, code);
+	}
+}
+
+const initialState: EditorState = {
+	code: defaultCode, // Will be updated in browser
 	error: null,
 	mei: null,
 	svg: null,
@@ -41,9 +62,20 @@ const initialState: EditorState = {
 function createEditorStore() {
 	const { subscribe, set, update }: Writable<EditorState> = writable(initialState);
 
+	// Load saved code in browser
+	if (browser) {
+		const savedCode = loadSavedCode();
+		if (savedCode !== defaultCode) {
+			update((s) => ({ ...s, code: savedCode }));
+		}
+	}
+
 	return {
 		subscribe,
-		setCode: (code: string) => update((s) => ({ ...s, code })),
+		setCode: (code: string) => {
+			saveCode(code);
+			update((s) => ({ ...s, code }));
+		},
 		setMEI: (mei: string) => update((s) => ({ ...s, mei })),
 		setSVG: (svg: string, pageCount: number) =>
 			update((s) => ({ ...s, svg, pageCount, error: null })),
