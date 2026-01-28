@@ -810,37 +810,81 @@ c4 c g' g | a a g2 | f4 f e e | d d c2 | g'4 g f f | e e d2 | g4 g f f | e e d2 
 c4\p( d e f) | g2\< a | b4\mf\> a g f | e2\p d | c4\pp( e g c) | c2.\fermata r4
 ```
 
+
 ### Example 4: Two-Staff Piano Score
 
+Expressive etude in E Major with complex texture.
+
 ```lilylet
-[title "Piano Exercise"]
-[subtitle "A Practice"]
+[title "Etude in E Major (excerpt)"]
+[subtitle "Tristesse"]
+[composer "Chopin Op.10 No.3"]
 
-\staff "1" \key c \major \time 4/4 \clef "treble" \stemDown c'8([ e g] \stemDown c,[ e g] \stemDown c,[ e g] \stemDown c,[ e g] \\
-\staff "2" \clef "treble" c1 \\
-\staff "2" \clef "treble" c'4\rest \stemUp <e, g> <e g> <e g> | %1
+\staff "1" \key e \major \time 2/4 \clef "treble" \stemUp b8\p \\
+\staff "2" \clef "bass" g8\rest | %1
 
-\staff "1" \stemDown \clef "treble" c'8[ e g] \stemDown c,[ e g] \stemDown c,[ e g] \stemDown c,[ e g] \\
-\staff "2" \clef "treble" c1 \\
-\staff "2" \clef "treble" \stemUp c'4\rest <e, g> <e g> <e g> | %2
+\staff "1" \clef "treble" \stemUp e8[ ds16 e] fs4~ \\
+\staff "1" \clef "treble" s4 \stemDown ds~ \\
+\staff "2" \stemUp \clef "bass" e,,4 b \\
+\staff "2" \stemDown \clef "bass" e,,16[ b'8 b16] b,[ b'8 b16] \\
+\staff "2" \stemUp \clef "bass" gs16[ b gs b] a[ b a b] | %2
 
-\staff "1" \stemDown \clef "treble" d'8[ f g] \stemDown d[ f g] \stemDown d[ f g] \stemDown d[ f g] \\
-\staff "2" \clef "treble" b1 \\
-\staff "2" \clef "treble" \stemUp c'4\rest <d, g> <d g> <d g> | %3
+\staff "1" \clef "treble" \stemUp fs16([ gs] gs[ fs)] gs4~ \\
+\staff "1" \clef "treble" \stemDown ds8[ ds] e4 \\
+\staff "2" \clef "bass" \stemUp b,,4 e \\
+\staff "2" \clef "bass" \stemDown b,,16[ b'8 b16] e,[ b'8 b16] \\
+\staff "2" \clef "bass" \stemUp a16[ b a b] gs[ b gs b] | %3
 
-\staff "1" \stemDown \clef "treble" e'8[ f g] \stemDown f[ e d] \stemDown c2) \\
-\staff "2" \clef "treble" c1 \\
-\staff "2" \clef "treble" \stemUp c'4\rest <e, g> <e g> <e g> | %4
+\staff "1" \clef "treble" \stemUp gs'16([ a] a[ gs)] cs8.([ b16] \\
+\staff "1" \clef "treble" \stemDown gs16[ e' b e] ds[ a' b, ds] \\
+\staff "2" \clef "bass" \stemDown e,,16[ b'8 b16] b,[ b'8 b16] \\
+\staff "2" \clef "bass" \stemUp e,,4 b | %4
+
+\staff "1" \clef "treble" \stemUp a'16[ gs ds e)] fs4~ \\
+\staff "1" \clef "treble" \stemDown b16[ e gs, b] \stemUp <a cs>[ <b ds> <a cs> <b ds>] \\
+\staff "2" \clef "bass" \stemDown e,,16[ b'8 b16] b,[ b'8 b16] \\
+\staff "2" \clef "bass" \stemUp e,,4 b | %5
+
+\staff "1" \clef "treble" \stemUp fs16([ gs] gs[ fs)] e4 \\
+\staff "2" \clef "bass" \stemUp b,,4 e \\
+\staff "2" \clef "bass" \stemDown b,,16[ b'8 b16] e,[ b'8 b16] \\
+\staff "2" \clef "bass" \stemUp <a cs>16[ <b ds>] <a cs>[ <b ds>] gs[ b gs b] | %6
+
+\staff "1" \clef "treble" \stemUp gs'16([ a fs gs] a[ b gs a)] \\
+\staff "1" \stemDown \clef "treble" d16[ e d e] cs[ e cs e] \\
+\staff "2" \clef "bass" \stemDown e,,16[ e'8 e16] a,[ e'8 e16] \\
+\staff "2" \clef "bass" \stemUp e,,4 a | %7
+
+\staff "1" \clef "treble" \stemUp cs'8 fs,4 \stemUp \grace as8( \stemUp gs16)([ fs)]~ \\
+\staff "1" \clef "treble" \stemDown cs16[ e cs e] b[ e b e] \\
+\staff "2" \clef "bass" \stemDown a,16[ fs'8 fs16] b,[ fs'8 fs16] \\
+\staff "2" \clef "bass" \stemUp a,4 b | %8
 ```
+
 
 ### Example 5: Baroque Style
 
-```lilylet
-[title "Baroque Prelude"]
+Complex contrapuntal writing with three independent voices.
 
-\key d \minor
-\time 4/4
-d8[ f a d] f[ a d a] | f[ d a, f] d[ f a d] | \times 2/3 { e8 g bf } \times 2/3 { e g bf } e4 r | \ottava #1 \grace cs16 d4 \grace e16 f4 \grace g16 a2 |
+```lilylet
+[title "Sinfonia No.1 C Major (excerpt)"]
+[arranger "BWV787"]
+
+\staff "1" \key c \major \time 4/4 \clef "treble" g'16\rest \stemUp g([ a b] \stemDown c[ d e f] g[ f g a] f[ a g f] \\
+\staff "2" \clef "bass" \stemUp c,4 d8 \stemDown c'( b[ g] a[ b] \\
+\staff "2" \clef "bass" c1\rest | %1
+
+\staff "1" \stemUp \clef "treble" e'2)~ e4 fs( \\
+\staff "1" \clef "treble" g'16 \stemUp c,[ d e] f[ \stemDown g a b] c[ b c d] c[ e d c] \\
+\staff "2" \clef "bass" \stemDown c4)( c8\rest b a[ g] a)[ d,(] | %2
+
+\staff "1" \clef "treble" \stemUp g''8[ f] e4 d8[ e16 f] d4~ \\
+\staff "1" \clef "treble" \stemDown b'8([ d]~ d[ c]~ c4 b~ \\
+\staff "2" \clef "bass" \stemDown g,16)[ g'( a b] \clef "treble" \stemUp c[ d e f] g[ f g a] f[ a g f] | %3
+
+\staff "1" \clef "treble" \stemUp d'8\f[ g16 f] e4)~ e8[ e] d4~ \\
+\staff "1" \clef "treble" \stemDown b'4) g16 d'([ c b] a4.) a8( \\
+\staff "2" \clef "treble" \stemUp e16)[ f( e d] \clef "bass" \stemDown c[ b a g] f[ g f e] f[ d e f] | %4
 ```
 
 ### Example 6: Modern Rhythms
