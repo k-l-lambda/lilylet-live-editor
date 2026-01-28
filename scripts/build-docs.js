@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import MarkdownIt from 'markdown-it';
+import markdownItAnchor from 'markdown-it-anchor';
 import { parseCode, meiEncoder } from '@k-l-lambda/lilylet';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -399,11 +400,14 @@ async function buildDocs() {
   const toolkit = await initVerovio();
   console.log('Verovio initialized.\n');
 
-  // Initialize markdown-it
+  // Initialize markdown-it with anchor plugin for heading IDs
   const md = new MarkdownIt({
     html: true,
     linkify: true,
     typographer: true
+  }).use(markdownItAnchor, {
+    slugify: (s) => s.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim(),
+    permalink: false
   });
 
   // Custom renderer for lilylet code blocks - renders both code and music
