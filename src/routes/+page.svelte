@@ -14,6 +14,11 @@
 	let lastRenderedWidth = 0;
 	let resizeDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
+	// Divider drag state
+	let isDragging = false;
+	let editorWidth = 40; // percentage
+	let mainElement: HTMLElement;
+
 	// Render cancellation token to prevent out-of-order updates
 	let currentRenderId = 0;
 
@@ -114,6 +119,23 @@
 		}
 	}
 
+	function handleDividerMouseDown(e: MouseEvent) {
+		isDragging = true;
+		e.preventDefault();
+	}
+
+	function handleMouseMove(e: MouseEvent) {
+		if (!isDragging || !mainElement) return;
+		const rect = mainElement.getBoundingClientRect();
+		const newWidth = ((e.clientX - rect.left) / rect.width) * 100;
+		// Clamp between 20% and 80%
+		editorWidth = Math.max(20, Math.min(80, newWidth));
+	}
+
+	function handleMouseUp() {
+		isDragging = false;
+	}
+
 	onMount(() => {
 		if (browser) {
 			// Load state from URL if present
@@ -123,6 +145,15 @@
 			}
 
 			setupVerovio();
+
+			// Add global mouse event listeners for dragging
+			window.addEventListener('mousemove', handleMouseMove);
+			window.addEventListener('mouseup', handleMouseUp);
+
+			return () => {
+				window.removeEventListener('mousemove', handleMouseMove);
+				window.removeEventListener('mouseup', handleMouseUp);
+			};
 		}
 	});
 </script>
@@ -159,11 +190,11 @@
 		</div>
 	</header>
 
-	<main>
-		<div class="pane editor-pane">
+	<main bind:this={mainElement} class:dragging={isDragging}>
+		<div class="pane editor-pane" style="flex: 0 0 {editorWidth}%">
 			<Editor />
 		</div>
-		<div class="divider"></div>
+		<div class="divider" on:mousedown={handleDividerMouseDown}></div>
 		<div class="pane preview-pane">
 			<Preview />
 		</div>
@@ -270,8 +301,7 @@
 	}
 
 	.editor-pane {
-		flex: 0 0 40%;
-		min-width: 300px;
+		min-width: 200px;
 	}
 
 	.preview-pane {
@@ -285,6 +315,15 @@
 	}
 
 	.divider:hover {
+		background: #0078d4;
+	}
+
+	main.dragging {
+		cursor: col-resize;
+		user-select: none;
+	}
+
+	main.dragging .divider {
 		background: #0078d4;
 	}
 </style>
