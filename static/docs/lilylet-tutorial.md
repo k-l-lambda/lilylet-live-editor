@@ -452,17 +452,17 @@ c4\pp d e f | g\mf a b c | d\f e f g | a\ff b c d
 
 ```lilylet
 \time 4/4
-c4\p\< d e f | g a b c\f
+c4\< d e f | g a b c\!
 ```
 
 ```lilylet
 \time 4/4
-c'4\f\> b a g | f e d c\p
+c'4\> b a g | f e d c\!
 ```
 
 ```lilylet
 \time 4/4
-c4\pp\< d e f | g\mf a b c | d\< e f g | a\ff\> b a g | f\p e d c
+c4\pp\< d e f | g\mf a b c | d e f g\! | a\ff\> b a g | f\p\! e d c
 ```
 
 ---
@@ -545,7 +545,7 @@ Use `\grace` before a note or a group:
 
 ```lilylet
 \time 4/4
-\grace d16 c4 e g c | \grace { b,16 c } d4 f a d'
+\grace d16 c4 e g c | \grace { b,16 c } d4 f a d
 ```
 
 ```lilylet
@@ -571,12 +571,12 @@ Use `\times numerator/denominator { notes }`:
 
 ```lilylet
 \time 4/4
-c4 \times 2/3 { d8 e f } g4 \times 2/3 { a8 b c } | d1
+c4 \times 2/3 { d8[ e f] } g4 \times 2/3 { a8[ b c] } | d1
 ```
 
 ```lilylet
 \time 4/4
-\times 4/5 { c8 d e f g } \times 4/5 { a b c d e } | f1
+\times 4/5 { c8[ d e f g] } \times 4/5 { a[ b c d e] } | f1
 ```
 
 ---
@@ -686,14 +686,14 @@ c4 e g | c2.
 
 ```lilylet
 \time 4/4
-c4 d e f | \ottava #1 g a b c | d e f g | \ottava #0 a b c d
+c''4 d e f | \ottava #1 g a b c | b a g f | \ottava #0 e d c2
 ```
 
 ### Pedal markings
 
 ```lilylet
 \time 4/4
-c4\sustainOn e g c | e g c g | e c g e | c1\sustainOff
+c4\sustainOn e g c\sustainOff | d\sustainOn fs a d\sustainOff |
 ```
 
 ### Metadata headers
@@ -702,6 +702,7 @@ Put metadata at the top of a snippet. This works well in Markdown collections (h
 
 ```lilylet
 [title "Minuet in G"]
+[subtitle "BWV-114"]
 [composer "J.S. Bach"]
 
 \key g \major \time 3/4 \clef "treble" \stemDown d'4(\p \stemUp g,8[ a b c] | \stemDown d4) \stemUp g, g
@@ -749,7 +750,7 @@ Expressive etude in E Major with complex texture.
 ```lilylet
 [title "Etude in E Major (excerpt)"]
 [subtitle "Tristesse"]
-[composer "Chopin Op.10 No.3"]
+[composer "Chopin"]
 
 \staff "1" \key e \major \time 2/4 \clef "treble" \stemUp b8\p \\
 \staff "2" \clef "bass" g8\rest | %1
@@ -801,8 +802,7 @@ Complex contrapuntal writing with three independent voices.
 [arranger "BWV787"]
 
 \staff "1" \key c \major \time 4/4 \clef "treble" g'16\rest \stemUp g([ a b] \stemDown c[ d e f] g[ f g a] f[ a g f] \\
-\staff "2" \clef "bass" \stemUp c,4 d8 \stemDown c'( b[ g] a[ b] \\
-\staff "2" \clef "bass" c1\rest | %1
+\staff "2" \clef "bass" \stemUp c,4 d8 \stemDown c'( b[ g] a[ b] | %1
 
 \staff "1" \stemUp \clef "treble" e'2)~ e4 fs( \\
 \staff "1" \clef "treble" g'16 \stemUp c,[ d e] f[ \stemDown g a b] c[ b c d] c[ e d c] \\
