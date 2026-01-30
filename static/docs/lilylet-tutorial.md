@@ -419,7 +419,7 @@ Use `\chords "symbol"` to add chord symbols above the staff, commonly used in le
 
 ```lilylet
 \time 4/4
-c'4 \chords "C" e g c' | a, \chords "Am" c e a
+c'4 \chords "C" e g c | a, \chords "Am" c e a
 ```
 
 ```lilylet
@@ -482,7 +482,16 @@ Fingering can also be applied to chords:
 
 ```lilylet
 \time 4/4
-<c' e g>2-1 <d f a>-2 | <e g b>-3 <f a c>-4
+<c' e g>2-1-3-5 <d f a>-2 | <e g b>-3 <f a c>-4
+```
+
+### Fingering placement
+
+Use `^` for above or `_` for below:
+
+```lilylet
+\time 4/4
+c'4^-1 d^-2 e^-3 f^-4 | g_-5 a_-3 b_-2 c_-1
 ```
 
 ---
@@ -505,7 +514,7 @@ Fingering can also be applied to chords:
 
 ```lilylet
 \time 4/4
-c4\pp d e f | g\mf a b c | d\f e f g | a\ff b c d
+c4\pp d e f | g\mf a b c | d\f e f g | a\ff b c d\sfz
 ```
 
 ### Hairpins (crescendo/diminuendo)
