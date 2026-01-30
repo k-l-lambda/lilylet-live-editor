@@ -487,11 +487,16 @@ Fingering can also be applied to chords:
 
 ### Fingering placement
 
-Use `^` for above or `_` for below:
+Use `^` for above or `_` for below. Both full form (`^-1`) and shorthand form (`^1`) are supported:
 
 ```lilylet
 \time 4/4
 c'4^-1 d^-2 e^-3 f^-4 | g_-5 a_-3 b_-2 c_-1
+```
+
+```lilylet
+\time 4/4
+c'4^1 d^2 e^3 f^4 | g_5 a_3 b_2 c_1
 ```
 
 ---

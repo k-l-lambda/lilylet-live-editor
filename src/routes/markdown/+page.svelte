@@ -501,10 +501,11 @@ console.log('Hello, Lilylet!');
 			}
 
 			try {
-				const mei = lilyletToMEI(source);
+				const result = lilyletToMEI(source);
 				if (version !== renderVersion) return;
-				if (!mei) continue;
+				if (!result.success) continue;
 
+				const mei = result.mei;
 				const effectiveWidth = Math.max(400, containerWidth - 80);
 				const pageWidthUnits = Math.round(effectiveWidth * 2.5);
 
@@ -560,15 +561,17 @@ console.log('Hello, Lilylet!');
 
 			try {
 				// Parse lilylet code to MEI
-				const mei = await lilyletToMEI(source);
+				const result = await lilyletToMEI(source);
 
 				// Check again after async operation
 				if (version !== renderVersion) return;
 
-				if (!mei) {
-					el.innerHTML = `<pre class="error">Failed to parse lilylet code</pre>`;
+				if (!result.success) {
+					el.innerHTML = `<pre class="error">Failed to parse lilylet code: ${result.error}</pre>`;
 					continue;
 				}
+
+				const mei = result.mei;
 
 				// Calculate pageWidth based on container - account for padding and borders
 				const effectiveWidth = Math.max(400, containerWidth - 80); // 80px for padding/margins

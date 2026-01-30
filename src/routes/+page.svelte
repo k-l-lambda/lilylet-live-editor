@@ -71,11 +71,11 @@
 		try {
 			// Convert Lilylet to MEI
 			const result = await lilyletToMEI(code);
-			if (!result) {
+			if (!result.success) {
 				// Check if this render is still current
 				if (renderId !== currentRenderId) return;
 				editorStore.setError('Failed to parse Lilylet code');
-				editorStore.addLog('error', 'Lilylet to MEI conversion failed: parse error');
+				editorStore.addLog('error', `Lilylet to MEI conversion failed: ${result.error}`);
 				return;
 			}
 

@@ -9,15 +9,19 @@ export type ConversionResult = {
 	error: string;
 };
 
-export interface MEIResult {
+export type MEIResult = {
+	success: true;
 	mei: string;
 	measureCount: number;
-}
+} | {
+	success: false;
+	error: string;
+};
 
 /**
  * Convert Lilylet code to MEI XML
  */
-export function lilyletToMEI(code: string): MEIResult | null {
+export function lilyletToMEI(code: string): MEIResult {
 	try {
 		// Parse Lilylet code to LilyletDoc
 		const doc = lilylet.parseCode(code);
@@ -26,12 +30,14 @@ export function lilyletToMEI(code: string): MEIResult | null {
 		const mei = lilylet.meiEncoder.encode(doc);
 
 		return {
+			success: true,
 			mei,
 			measureCount: doc.measures?.length || 1
 		};
 	} catch (error) {
+		const errorMessage = error instanceof Error ? error.message : String(error);
 		console.error('Lilylet parsing error:', error);
-		return null;
+		return { success: false, error: errorMessage };
 	}
 }
 
