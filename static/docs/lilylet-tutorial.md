@@ -482,17 +482,12 @@ Fingering can also be applied to chords:
 
 ```lilylet
 \time 4/4
-<c' e g>2-1-3-5 <d f a>-2 | <e g b>-3 <f a c>-4
+<c e c'>2-1-2-5 <e g c>-2-3-5 | <e g b>-1-2-4 <f a c>-1-2-3
 ```
 
 ### Fingering placement
 
-Use `^` for above or `_` for below. Both full form (`^-1`) and shorthand form (`^1`) are supported:
-
-```lilylet
-\time 4/4
-c'4^-1 d^-2 e^-3 f^-4 | g_-5 a_-3 b_-2 c_-1
-```
+Use `^` for above or `_` for below.
 
 ```lilylet
 \time 4/4
