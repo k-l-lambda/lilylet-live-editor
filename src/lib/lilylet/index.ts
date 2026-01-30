@@ -52,10 +52,17 @@ export function musicXmlToLilylet(xml: string): ConversionResult {
 
 /**
  * Convert LilyPond to Lilylet code
+ * Note: lilypondDecoder requires optional @k-l-lambda/lotus dependency
  */
 export function lilypondToLilylet(source: string): ConversionResult {
 	try {
-		const doc = lilylet.lilypondDecoder.decode(source);
+		// lilypondDecoder is not included in the main lilylet export
+		// It requires the optional @k-l-lambda/lotus dependency
+		const lilypondDecoder = (lilylet as any).lilypondDecoder;
+		if (!lilypondDecoder) {
+			return { success: false, error: 'LilyPond decoder not available (requires @k-l-lambda/lotus)' };
+		}
+		const doc = lilypondDecoder.decode(source);
 		const code = lilylet.serializeLilyletDoc(doc);
 		return { success: true, data: code };
 	} catch (error) {
