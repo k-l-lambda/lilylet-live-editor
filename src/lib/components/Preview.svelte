@@ -10,6 +10,7 @@
 	let cursorStyle = '';
 	let lastRenderedSvg = '';
 	let resizeObserver: ResizeObserver | null = null;
+	let exportMenuOpen = false;
 
 	/**
 	 * Safely inject SVG content using DOMParser.
@@ -111,12 +112,33 @@
 		}
 	}
 
-	function copyMEI() {
-		if ($editorStore.mei) {
-			navigator.clipboard.writeText($editorStore.mei).then(() => {
-				// Could add a toast notification here
-			});
+	function exportLilyPond() {
+		// TODO:
+		//if ($editorStore.code) {
+		//}
+	}
+
+	function toggleExportMenu() {
+		exportMenuOpen = !exportMenuOpen;
+	}
+
+	function closeExportMenu() {
+		exportMenuOpen = false;
+	}
+
+	function handleExport(type: string) {
+		switch (type) {
+			case 'svg':
+				exportSVG();
+				break;
+			case 'lilypond':
+				exportLilyPond();
+				break;
+			case 'mei':
+				exportMEI();
+				break;
 		}
+		closeExportMenu();
 	}
 
 	function handleContainerResize() {
@@ -156,16 +178,44 @@
 			<span class="rendering">Rendering...</span>
 		{/if}
 		<div class="spacer"></div>
-		<div class="export-buttons">
-			<button class="export-btn" on:click={exportSVG} disabled={!$editorStore.svg} title="Download SVG">
-				SVG
+		<div class="export-dropdown">
+			<button class="export-toggle" on:click={toggleExportMenu}>
+				Export ▾
 			</button>
-			<button class="export-btn" on:click={exportMEI} disabled={!$editorStore.mei} title="Download MEI">
-				MEI
-			</button>
-			<button class="export-btn" on:click={copyMEI} disabled={!$editorStore.mei} title="Copy MEI to clipboard">
-				Copy
-			</button>
+			{#if exportMenuOpen}
+				<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+				<div class="export-backdrop" on:click={closeExportMenu}></div>
+				<div class="export-menu">
+					<button
+						class="export-item"
+						on:click={() => handleExport('svg')}
+					>
+						SVG
+					</button>
+					<button
+						class="export-item"
+						on:click={() => handleExport('lilypond')}
+						disabled
+						title="Not implemented yet"
+					>
+						LilyPond (.ly)
+					</button>
+					<button
+						class="export-item"
+						disabled
+						title="Not implemented yet"
+					>
+						MusicXML
+					</button>
+					<button
+						class="export-item"
+						on:click={() => handleExport('mei')}
+						disabled={!$editorStore.mei}
+					>
+						MEI
+					</button>
+				</div>
+			{/if}
 		</div>
 	</div>
 
@@ -370,12 +420,11 @@
 		flex: 1;
 	}
 
-	.export-buttons {
-		display: flex;
-		gap: 8px;
+	.export-dropdown {
+		position: relative;
 	}
 
-	.export-btn {
+	.export-toggle {
 		background: #0e639c;
 		color: #ffffff;
 		border: none;
@@ -386,17 +435,62 @@
 		transition: background 0.2s;
 	}
 
-	.export-btn:hover:not(:disabled) {
+	.export-toggle:hover {
 		background: #1177bb;
 	}
 
-	.export-btn:disabled {
-		background: #3c3c3c;
-		color: #858585;
+	.export-backdrop {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 99;
+	}
+
+	.export-menu {
+		position: absolute;
+		top: 100%;
+		right: 0;
+		margin-top: 4px;
+		background: #252526;
+		border: 1px solid #3c3c3c;
+		border-radius: 4px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+		min-width: 160px;
+		z-index: 100;
+		overflow: hidden;
+	}
+
+	.export-item {
+		display: block;
+		width: 100%;
+		padding: 8px 16px;
+		background: transparent;
+		border: none;
+		color: #cccccc;
+		font-size: 13px;
+		text-align: left;
+		cursor: pointer;
+		transition: background 0.15s;
+	}
+
+	.export-item:hover:not(:disabled) {
+		background: #094771;
+	}
+
+	.export-item:disabled {
+		color: #5a5a5a;
 		cursor: not-allowed;
 	}
 
-	.export-btn:active:not(:disabled) {
-		background: #094771;
+	.export-item:not(:last-child) {
+		border-bottom: 1px solid #3c3c3c;
+	}
+
+	.not-impl {
+		font-size: 11px;
+		color: #858585;
+		margin-left: 4px;
 	}
 </style>
