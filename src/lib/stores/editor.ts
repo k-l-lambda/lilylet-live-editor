@@ -3,6 +3,12 @@ import { browser } from '$app/environment';
 
 const STORAGE_KEY = 'lilylet-editor-code';
 
+export interface LogEntry {
+	timestamp: Date;
+	level: 'info' | 'warning' | 'error';
+	message: string;
+}
+
 export interface EditorState {
 	code: string;
 	error: string | null;
@@ -13,6 +19,8 @@ export interface EditorState {
 	verovioReady: boolean;
 	cursorElementId: string | null;
 	previewWidth: number;
+	logs: LogEntry[];
+	logsExpanded: boolean;
 }
 
 // Sample Lilylet code demonstrating basic syntax
@@ -56,7 +64,9 @@ const initialState: EditorState = {
 	isRendering: false,
 	verovioReady: false,
 	cursorElementId: null,
-	previewWidth: 800
+	previewWidth: 800,
+	logs: [],
+	logsExpanded: false
 };
 
 function createEditorStore() {
@@ -84,6 +94,15 @@ function createEditorStore() {
 		setVerovioReady: (verovioReady: boolean) => update((s) => ({ ...s, verovioReady })),
 		setCursorElement: (cursorElementId: string | null) => update((s) => ({ ...s, cursorElementId })),
 		setPreviewWidth: (previewWidth: number) => update((s) => ({ ...s, previewWidth })),
+		addLog: (level: LogEntry['level'], message: string) => update((s) => {
+			const newLog: LogEntry = { timestamp: new Date(), level, message };
+			const newLogs = [...s.logs, newLog].slice(-100); // Keep last 100 logs
+			// Auto-expand on error
+			const shouldExpand = level === 'error' ? true : s.logsExpanded;
+			return { ...s, logs: newLogs, logsExpanded: shouldExpand };
+		}),
+		setLogsExpanded: (expanded: boolean) => update((s) => ({ ...s, logsExpanded: expanded })),
+		clearLogs: () => update((s) => ({ ...s, logs: [] })),
 		reset: () => set(initialState)
 	};
 }

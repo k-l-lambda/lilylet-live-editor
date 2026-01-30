@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 	import { EditorView, basicSetup } from 'codemirror';
 	import { EditorState } from '@codemirror/state';
 	import { oneDark } from '@codemirror/theme-one-dark';
 	import { editorStore } from '$lib/stores/editor';
 	import { lilylet } from '$lib/lilylet/highlight';
+
+	const dispatch = createEventDispatcher<{ filedrop: File }>();
 
 	let editorContainer: HTMLDivElement;
 	let view: EditorView | null = null;
@@ -15,6 +17,31 @@
 
 	// Track if the editor is the source of the change
 	let isEditorUpdate = false;
+
+	// Check if a file is a supported music file
+	function isMusicFile(fileName: string): boolean {
+		const lower = fileName.toLowerCase();
+		return lower.endsWith('.ly') || lower.endsWith('.ily') ||
+			lower.endsWith('.musicxml') || lower.endsWith('.mxl') ||
+			(lower.endsWith('.xml') && !lower.endsWith('.mei.xml'));
+	}
+
+	// Extension to intercept drop events for music files
+	const dropHandler = EditorView.domEventHandlers({
+		drop(event: DragEvent) {
+			const files = event.dataTransfer?.files;
+			if (files && files.length > 0) {
+				const file = files[0];
+				if (isMusicFile(file.name)) {
+					event.preventDefault();
+					event.stopPropagation();
+					dispatch('filedrop', file);
+					return true;
+				}
+			}
+			return false;
+		}
+	});
 
 	function handleUpdate(update: any) {
 		if (update.docChanged) {
@@ -65,7 +92,8 @@
 				oneDark,
 				lilylet(),
 				EditorView.updateListener.of(handleUpdate),
-				EditorView.lineWrapping
+				EditorView.lineWrapping,
+				dropHandler
 			]
 		});
 

@@ -5,7 +5,7 @@
 	import Editor from '$lib/components/Editor.svelte';
 	import Preview from '$lib/components/Preview.svelte';
 	import { editorStore } from '$lib/stores/editor';
-	import { lilyletToMEI } from '$lib/lilylet';
+	import { lilyletToMEI, musicXmlToLilylet, lilypondToLilylet } from '$lib/lilylet';
 	import { getStateFromUrl, copyShareUrl } from '$lib/utils/share';
 	import { initVerovio, getToolkit } from '$lib/verovio/toolkit';
 
@@ -18,6 +18,9 @@
 	let isDragging = false;
 	let editorWidth = 40; // percentage
 	let mainElement: HTMLElement;
+
+	// Drag and drop state
+	let isDragOver = false;
 
 	// Render cancellation token to prevent out-of-order updates
 	let currentRenderId = 0;
@@ -67,13 +70,16 @@
 
 		try {
 			// Convert Lilylet to MEI
-			const mei = await lilyletToMEI(code);
-			if (!mei) {
+			const result = await lilyletToMEI(code);
+			if (!result) {
 				// Check if this render is still current
 				if (renderId !== currentRenderId) return;
 				editorStore.setError('Failed to parse Lilylet code');
+				editorStore.addLog('error', 'Lilylet to MEI conversion failed: parse error');
 				return;
 			}
+
+			const { mei, measureCount } = result;
 
 			// Check if this render is still current before updating store
 			if (renderId !== currentRenderId) return;
@@ -85,9 +91,16 @@
 			// At scale 40, approximately 2.5 abstract units = 1 pixel
 			const pageWidthUnits = Math.round(effectiveWidth * 2.5);
 
+			// Calculate pageHeight based on measure count
+			// ~20 measures fit in one standard page (height ~2000 units at scale 40)
+			const basePageHeight = 2000;
+			const measuresPerPage = 20;
+			const pageHeight = Math.max(basePageHeight, Math.ceil(measureCount / measuresPerPage) * basePageHeight);
+
 			toolkit.setOptions({
 				scale: 40,
 				adjustPageHeight: true,
+				pageHeight,
 				pageWidth: pageWidthUnits
 			});
 
@@ -96,6 +109,7 @@
 			if (!success) {
 				if (renderId !== currentRenderId) return;
 				editorStore.setError('Verovio failed to load MEI data');
+				editorStore.addLog('error', 'Verovio failed to load MEI data');
 				return;
 			}
 
@@ -110,6 +124,7 @@
 			if (renderId === currentRenderId) {
 				console.error('Render error:', err);
 				editorStore.setError(String(err));
+				editorStore.addLog('error', `Render error: ${String(err)}`);
 			}
 		} finally {
 			// Only clear rendering flag if this is the current render
@@ -117,6 +132,67 @@
 				editorStore.setRendering(false);
 			}
 		}
+	}
+
+	// Drag and drop handlers
+	function handleDragOver(e: DragEvent) {
+		e.preventDefault();
+		isDragOver = true;
+	}
+
+	function handleDragLeave(e: DragEvent) {
+		e.preventDefault();
+		isDragOver = false;
+	}
+
+	async function handleFileDrop(file: File) {
+		const fileName = file.name.toLowerCase();
+
+		// Check file type by extension
+		const isLilypond = fileName.endsWith('.ly') || fileName.endsWith('.ily');
+		const isMusicXml = fileName.endsWith('.musicxml') || fileName.endsWith('.mxl') ||
+			(fileName.endsWith('.xml') && !fileName.endsWith('.mei.xml'));
+
+		if (!isLilypond && !isMusicXml) {
+			editorStore.addLog('warning', `Unsupported file type: ${file.name}. Supported formats: .ly, .musicxml, .xml`);
+			return;
+		}
+
+		try {
+			const content = await file.text();
+			editorStore.addLog('info', `Converting ${file.name}...`);
+
+			if (isLilypond) {
+				const result = lilypondToLilylet(content);
+				if (result.success) {
+					editorStore.setCode(result.data);
+					editorStore.addLog('info', `Successfully converted ${file.name} to Lilylet`);
+				} else {
+					editorStore.addLog('error', result.error);
+				}
+			} else if (isMusicXml) {
+				const result = musicXmlToLilylet(content);
+				if (result.success) {
+					editorStore.setCode(result.data);
+					editorStore.addLog('info', `Successfully converted ${file.name} to Lilylet`);
+				} else {
+					editorStore.addLog('error', result.error);
+				}
+			}
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			editorStore.addLog('error', `Failed to read file: ${errorMessage}`);
+		}
+	}
+
+	async function handleDrop(e: DragEvent) {
+		e.preventDefault();
+		isDragOver = false;
+
+		const files = e.dataTransfer?.files;
+		if (!files || files.length === 0) return;
+
+		await handleFileDrop(files[0]);
 	}
 
 	function handleDividerMouseDown(e: MouseEvent) {
@@ -190,15 +266,59 @@
 		</div>
 	</header>
 
-	<main bind:this={mainElement} class:dragging={isDragging}>
+	<main
+		bind:this={mainElement}
+		class:dragging={isDragging}
+		class:drag-over={isDragOver}
+		on:dragover={handleDragOver}
+		on:dragleave={handleDragLeave}
+		on:drop={handleDrop}
+	>
 		<div class="pane editor-pane" style="flex: 0 0 {editorWidth}%">
-			<Editor />
+			<Editor on:filedrop={(e) => { isDragOver = false; handleFileDrop(e.detail); }} />
 		</div>
 		<div class="divider" on:mousedown={handleDividerMouseDown}></div>
 		<div class="pane preview-pane">
 			<Preview />
 		</div>
+		{#if isDragOver}
+			<div class="drop-overlay">
+				<div class="drop-message">
+					Drop LilyPond (.ly) or MusicXML (.musicxml, .xml) file to convert
+				</div>
+			</div>
+		{/if}
 	</main>
+
+	<!-- Collapsible Log Area -->
+	<div class="log-area" class:expanded={$editorStore.logsExpanded}>
+		<button class="log-toggle" on:click={() => editorStore.setLogsExpanded(!$editorStore.logsExpanded)}>
+			<span class="toggle-icon">{$editorStore.logsExpanded ? '▼' : '▶'}</span>
+			Logs ({$editorStore.logs.length})
+			{#if $editorStore.logs.filter(l => l.level === 'error').length > 0}
+				<span class="error-badge">{$editorStore.logs.filter(l => l.level === 'error').length} errors</span>
+			{/if}
+		</button>
+		{#if $editorStore.logsExpanded}
+			<div class="log-content">
+				<div class="log-actions">
+					<button class="clear-btn" on:click={() => editorStore.clearLogs()}>Clear</button>
+				</div>
+				<div class="log-entries">
+					{#each $editorStore.logs as log}
+						<div class="log-entry log-{log.level}">
+							<span class="log-time">{log.timestamp.toLocaleTimeString()}</span>
+							<span class="log-level">[{log.level.toUpperCase()}]</span>
+							<span class="log-message">{log.message}</span>
+						</div>
+					{/each}
+					{#if $editorStore.logs.length === 0}
+						<div class="log-empty">No logs yet</div>
+					{/if}
+				</div>
+			</div>
+		{/if}
+	</div>
 </div>
 
 <style>
@@ -325,5 +445,152 @@
 
 	main.dragging .divider {
 		background: #0078d4;
+	}
+
+	/* Drag and drop styles */
+	main.drag-over {
+		position: relative;
+	}
+
+	.drop-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(14, 99, 156, 0.9);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 100;
+		pointer-events: none;
+	}
+
+	.drop-message {
+		color: #ffffff;
+		font-size: 18px;
+		font-weight: 600;
+		padding: 24px 48px;
+		border: 3px dashed #ffffff;
+		border-radius: 8px;
+		text-align: center;
+	}
+
+	/* Log area styles */
+	.log-area {
+		border-top: 1px solid #454545;
+		background: #252526;
+	}
+
+	.log-toggle {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 6px 12px;
+		background: #333333;
+		border: none;
+		color: #d4d4d4;
+		font-size: 12px;
+		cursor: pointer;
+		text-align: left;
+	}
+
+	.log-toggle:hover {
+		background: #3c3c3c;
+	}
+
+	.toggle-icon {
+		font-size: 10px;
+		color: #858585;
+	}
+
+	.error-badge {
+		background: #f14c4c;
+		color: #ffffff;
+		padding: 1px 6px;
+		border-radius: 10px;
+		font-size: 11px;
+		margin-left: auto;
+	}
+
+	.log-content {
+		max-height: 200px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.log-actions {
+		padding: 4px 12px;
+		border-bottom: 1px solid #454545;
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.clear-btn {
+		background: transparent;
+		border: 1px solid #454545;
+		color: #858585;
+		padding: 2px 8px;
+		border-radius: 3px;
+		font-size: 11px;
+		cursor: pointer;
+	}
+
+	.clear-btn:hover {
+		background: #3c3c3c;
+		color: #d4d4d4;
+	}
+
+	.log-entries {
+		flex: 1;
+		overflow-y: auto;
+		padding: 8px 12px;
+		font-family: 'Consolas', 'Monaco', monospace;
+		font-size: 12px;
+	}
+
+	.log-entry {
+		padding: 2px 0;
+		display: flex;
+		gap: 8px;
+	}
+
+	.log-time {
+		color: #6a9955;
+		flex-shrink: 0;
+	}
+
+	.log-level {
+		flex-shrink: 0;
+		min-width: 60px;
+	}
+
+	.log-message {
+		word-break: break-word;
+	}
+
+	.log-info .log-level {
+		color: #4fc1ff;
+	}
+
+	.log-warning .log-level {
+		color: #cca700;
+	}
+
+	.log-error .log-level {
+		color: #f14c4c;
+	}
+
+	.log-error .log-message {
+		color: #f14c4c;
+	}
+
+	.log-empty {
+		color: #858585;
+		font-style: italic;
+		text-align: center;
+		padding: 16px;
 	}
 </style>
