@@ -79,7 +79,7 @@
 				return;
 			}
 
-			const { mei, measureCount } = result;
+			const { mei, measureCount, staffCount } = result;
 
 			// Check if this render is still current before updating store
 			if (renderId !== currentRenderId) return;
@@ -91,11 +91,11 @@
 			// At scale 40, approximately 2.5 abstract units = 1 pixel
 			const pageWidthUnits = Math.round(effectiveWidth * 2.5);
 
-			// Calculate pageHeight based on measure count
+			// Calculate pageHeight based on measure count and staff count
 			// ~20 measures fit in one standard page (height ~2000 units at scale 40)
 			const basePageHeight = 2000;
 			const measuresPerPage = 20;
-			const pageHeight = Math.max(basePageHeight, Math.ceil(measureCount / measuresPerPage) * basePageHeight);
+			const pageHeight = Math.max(basePageHeight, Math.ceil(measureCount / measuresPerPage) * basePageHeight) * 2 * staffCount;
 
 			toolkit.setOptions({
 				scale: 40,

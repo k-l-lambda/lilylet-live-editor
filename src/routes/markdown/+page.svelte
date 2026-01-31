@@ -506,13 +506,18 @@ console.log('Hello, Lilylet!');
 				if (!result.success) continue;
 
 				const mei = result.mei;
+				const { measureCount, staffCount } = result;
 				const effectiveWidth = Math.max(400, containerWidth - 80);
 				const pageWidthUnits = Math.round(effectiveWidth * 2.5);
+				const basePageHeight = 2000;
+				const measuresPerPage = 20;
+				const pageHeight = Math.max(basePageHeight, Math.ceil(measureCount / measuresPerPage) * basePageHeight) * 2 * staffCount;
 
 				toolkit.setOptions({
 					scale: 40,
 					adjustPageHeight: true,
-					pageWidth: pageWidthUnits
+					pageWidth: pageWidthUnits,
+					pageHeight
 				});
 
 				const loaded = toolkit.loadData(mei);
@@ -572,17 +577,22 @@ console.log('Hello, Lilylet!');
 				}
 
 				const mei = result.mei;
+				const { measureCount, staffCount } = result;
 
 				// Calculate pageWidth based on container - account for padding and borders
 				const effectiveWidth = Math.max(400, containerWidth - 80); // 80px for padding/margins
 				// Verovio scale 40 means 40% of default size, pageWidth is in abstract units
 				// At scale 40, approximately 2.5 abstract units = 1 pixel
 				const pageWidthUnits = Math.round(effectiveWidth * 2.5);
+				const basePageHeight = 2000;
+				const measuresPerPage = 20;
+				const pageHeight = Math.max(basePageHeight, Math.ceil(measureCount / measuresPerPage) * basePageHeight) * 2 * staffCount;
 
 				toolkit.setOptions({
 					scale: 40,
 					adjustPageHeight: true,
-					pageWidth: pageWidthUnits
+					pageWidth: pageWidthUnits,
+					pageHeight
 				});
 
 				const loaded = toolkit.loadData(mei);

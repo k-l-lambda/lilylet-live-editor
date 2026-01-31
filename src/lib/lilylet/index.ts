@@ -13,6 +13,7 @@ export type MEIResult = {
 	success: true;
 	mei: string;
 	measureCount: number;
+	staffCount: number;
 } | {
 	success: false;
 	error: string;
@@ -29,10 +30,21 @@ export function lilyletToMEI(code: string): MEIResult {
 		// Encode to MEI XML
 		const mei = lilylet.meiEncoder.encode(doc);
 
+		// Calculate total staff count
+		let staffCount = 1;
+		if (doc.measures && doc.measures.length > 0) {
+			const firstMeasure = doc.measures[0];
+			staffCount = firstMeasure.parts.reduce((total, part) => {
+				const maxStaff = part.voices.reduce((max, voice) => Math.max(max, voice.staff || 1), 1);
+				return total + maxStaff;
+			}, 0) || 1;
+		}
+
 		return {
 			success: true,
 			mei,
-			measureCount: doc.measures?.length || 1
+			measureCount: doc.measures?.length || 1,
+			staffCount
 		};
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : String(error);
