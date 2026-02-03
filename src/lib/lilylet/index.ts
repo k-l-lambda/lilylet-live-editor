@@ -90,4 +90,28 @@ export function lilypondToLilylet(source: string): ConversionResult {
 	}
 }
 
+/**
+ * Convert Lilylet code to LilyPond
+ */
+export function lilyletToLilyPond(code: string): ConversionResult {
+	try {
+		// Parse Lilylet code to LilyletDoc
+		const doc = lilylet.parseCode(code);
+
+		// Encode to LilyPond
+		const ly = lilylet.lilypondEncoder.encode(doc, {
+			paper: { width: 210, height: 297 },
+			fontSize: 20,
+			withMIDI: true,
+			autoBeaming: false
+		});
+
+		return { success: true, data: ly };
+	} catch (error) {
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		console.error('LilyPond encoding error:', error);
+		return { success: false, error: `LilyPond encoding failed: ${errorMessage}` };
+	}
+}
+
 export { lilylet } from './highlight';

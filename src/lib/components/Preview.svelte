@@ -3,6 +3,7 @@
 	import { editorStore } from '$lib/stores/editor';
 	import Player from './Player.svelte';
 	import { tick } from 'svelte';
+	import { lilyletToLilyPond } from '$lib/lilylet';
 
 	let svgContainer: HTMLDivElement;
 	let previewContainer: HTMLDivElement;
@@ -113,9 +114,14 @@
 	}
 
 	function exportLilyPond() {
-		// TODO:
-		//if ($editorStore.code) {
-		//}
+		if ($editorStore.code) {
+			const result = lilyletToLilyPond($editorStore.code);
+			if (result.success) {
+				downloadFile(result.data, 'lilylet-score.ly', 'text/x-lilypond');
+			} else {
+				console.error('LilyPond export failed:', result.error);
+			}
+		}
 	}
 
 	function toggleExportMenu() {
@@ -195,8 +201,7 @@
 					<button
 						class="export-item"
 						on:click={() => handleExport('lilypond')}
-						disabled
-						title="Not implemented yet"
+						disabled={!$editorStore.code}
 					>
 						LilyPond (.ly)
 					</button>
