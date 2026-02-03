@@ -15,19 +15,21 @@ Lilylet is a text-based music notation language inspired by [LilyPond](https://l
 4. [Rests](#rests)
 5. [Accidentals](#accidentals)
 6. [Key and Time Signatures](#key-and-time-signatures)
-7. [Chords](#chords)
-8. [Articulations](#articulations)
-9. [Dynamics](#dynamics)
-10. [Slurs, Ties, and Beams](#slurs-ties-and-beams)
-11. [Ornaments](#ornaments)
-12. [Grace Notes](#grace-notes)
-13. [Tuplets](#tuplets)
-14. [Tremolo](#tremolo)
-15. [Multiple Voices](#multiple-voices)
-16. [Multiple Staves](#multiple-staves)
-17. [Advanced Features](#advanced-features)
-18. [Complete Examples](#complete-examples)
-19. [Practical Writing Tips](#practical-writing-tips)
+7. [Barlines](#barlines)
+8. [Chords](#chords)
+9. [Articulations](#articulations)
+10. [Fingering](#fingering)
+11. [Dynamics](#dynamics)
+12. [Slurs, Ties, and Beams](#slurs-ties-and-beams)
+13. [Ornaments](#ornaments)
+14. [Grace Notes](#grace-notes)
+15. [Tuplets](#tuplets)
+16. [Tremolo](#tremolo)
+17. [Multiple Voices](#multiple-voices)
+18. [Multiple Staves](#multiple-staves)
+19. [Advanced Features](#advanced-features)
+20. [Complete Examples](#complete-examples)
+21. [Practical Writing Tips](#practical-writing-tips)
 
 ---
 
@@ -334,6 +336,38 @@ Supported clefs: `treble`, `bass`, `alto`
 
 ---
 
+## Barlines
+
+By default, Lilylet uses standard single barlines `|` to separate measures. For special barlines, use the `\bar` command.
+
+### Barline types
+
+| Notation | Meaning |
+|----------|---------|
+| `\bar "\|\|"` | Double barline |
+| `\bar "\|."` | Final barline (end of piece) |
+| `\bar ":\|."` | End repeat |
+| `\bar ".\|:"` | Start repeat |
+
+```lilylet
+\time 4/4
+c4 d e f \bar "||" | g a b c
+```
+
+```lilylet
+\time 4/4
+c4 d e f | g a b c \bar "|."
+```
+
+### Repeat barlines
+
+```lilylet
+\time 4/4
+c4 d e f \bar ".|:" | g a b c | d e f g \bar ":|."
+```
+
+---
+
 ## Chords
 
 ### Basic chords
@@ -379,6 +413,20 @@ The duration applies to the entire chord:
 <c e g>4 <c e g>8 <c e g>8 <c e g>2
 ```
 
+### Chord symbols (lead sheet style)
+
+Use `\chords "symbol"` to add chord symbols above the staff, commonly used in lead sheets and jazz charts:
+
+```lilylet
+\time 4/4
+c'4 \chords "C" e g c | a, \chords "Am" c e a
+```
+
+```lilylet
+\time 4/4
+c'4 \chords "Cmaj7" d e f | g \chords "G7" a b c
+```
+
 ---
 
 ## Articulations
@@ -421,6 +469,33 @@ c4^. d_. e^> f_>
 
 ---
 
+## Fingering
+
+Use `-1` through `-5` to add fingering numbers to notes, commonly used in piano and guitar music:
+
+```lilylet
+\time 4/4
+c'4-1 d-2 e-3 f-4 | g-5 a-3 b-2 c-1
+```
+
+Fingering can also be applied to chords:
+
+```lilylet
+\time 4/4
+<c e c'>2-1-2-5 <e g c>-2-3-5 | <e g b>-1-2-4 <f a c>-1-2-3
+```
+
+### Fingering placement
+
+Use `^` for above or `_` for below.
+
+```lilylet
+\time 4/4
+c'4^1 d^2 e^3 f^4 | g_5 a_3 b_2 c_1
+```
+
+---
+
 ## Dynamics
 
 ### Dynamic markings
@@ -439,7 +514,7 @@ c4^. d_. e^> f_>
 
 ```lilylet
 \time 4/4
-c4\pp d e f | g\mf a b c | d\f e f g | a\ff b c d
+c4\pp d e f | g\mf a b c | d\f e f g | a\ff b c d\sfz
 ```
 
 ### Hairpins (crescendo/diminuendo)
@@ -696,6 +771,22 @@ c''4 d e f | \ottava #1 g a b c | b a g f | \ottava #0 e d c2
 c4\sustainOn e g c\sustainOff | d\sustainOn fs a d\sustainOff |
 ```
 
+### Text markup
+
+Use `\markup "text"` to add text annotations to your score. Control placement with `^` (above) or `_` (below):
+
+```lilylet
+\time 4/4
+c'4 \markup "dolce" d e f | g a b c
+```
+
+```lilylet
+\time 4/4
+c'4^\markup "espressivo" d e f | g_\markup "cantabile" a b c
+```
+
+Markup is useful for expressive indications, technique instructions, or any text that doesn't fit standard dynamic or tempo markings.
+
 ### Metadata headers
 
 Put metadata at the top of a snippet. This works well in Markdown collections (handouts, chapters, indexes).
@@ -718,7 +809,7 @@ Put metadata at the top of a snippet. This works well in Markdown collections (h
 [title "Twinkle Twinkle"]
 
 \time 4/4
-c4 c g' g | a a g2 | f4 f e e | d d c2 | g'4 g f f | e e d2 | g4 g f f | e e d2 | c4 c g' g | a a g2 | f4 f e e | d d c2
+c4 c g' g | a a g2 | f4 f e e | d d c2 | g'4 g f f | e e d2 | g4 g f f | e e d2 | c4 c g' g | a a g2 | f4 f e e | d d c2 \bar "|."
 ```
 
 ### Example 2: Piano Style with Chords
