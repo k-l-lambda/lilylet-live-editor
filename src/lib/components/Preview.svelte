@@ -3,7 +3,7 @@
 	import { editorStore } from '$lib/stores/editor';
 	import Player from './Player.svelte';
 	import { tick } from 'svelte';
-	import { lilyletToLilyPond } from '$lib/lilylet';
+	import { lilyletToLilyPond, lilyletToMusicXml } from '$lib/lilylet';
 
 	let svgContainer: HTMLDivElement;
 	let previewContainer: HTMLDivElement;
@@ -124,6 +124,17 @@
 		}
 	}
 
+	function exportMusicXml() {
+		if ($editorStore.code) {
+			const result = lilyletToMusicXml($editorStore.code);
+			if (result.success) {
+				downloadFile(result.data, 'lilylet-score.musicxml', 'application/vnd.recordare.musicxml+xml');
+			} else {
+				console.error('MusicXML export failed:', result.error);
+			}
+		}
+	}
+
 	function toggleExportMenu() {
 		exportMenuOpen = !exportMenuOpen;
 	}
@@ -139,6 +150,9 @@
 				break;
 			case 'lilypond':
 				exportLilyPond();
+				break;
+			case 'musicxml':
+				exportMusicXml();
 				break;
 			case 'mei':
 				exportMEI();
@@ -207,8 +221,8 @@
 					</button>
 					<button
 						class="export-item"
-						disabled
-						title="Not implemented yet"
+						on:click={() => handleExport('musicxml')}
+						disabled={!$editorStore.code}
 					>
 						MusicXML
 					</button>

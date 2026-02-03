@@ -114,4 +114,23 @@ export function lilyletToLilyPond(code: string): ConversionResult {
 	}
 }
 
+/**
+ * Convert Lilylet code to MusicXML
+ */
+export function lilyletToMusicXml(code: string): ConversionResult {
+	try {
+		// Parse Lilylet code to LilyletDoc
+		const doc = lilylet.parseCode(code);
+
+		// Encode to MusicXML
+		const xml = lilylet.musicXmlEncoder.encode(doc);
+
+		return { success: true, data: xml };
+	} catch (error) {
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		console.error('MusicXML encoding error:', error);
+		return { success: false, error: `MusicXML encoding failed: ${errorMessage}` };
+	}
+}
+
 export { lilylet } from './highlight';
