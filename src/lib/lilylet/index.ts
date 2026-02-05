@@ -70,12 +70,26 @@ export function musicXmlToLilylet(xml: string): ConversionResult {
 
 /**
  * Convert LilyPond to Lilylet code
- * Note: This feature is not available in browser - requires @k-l-lambda/lotus which only works in Node.js
+ * Note: lilypondDecoder requires optional @k-l-lambda/lotus dependency
  */
-export async function lilypondToLilylet(_source: string): Promise<ConversionResult> {
-	// LilyPond decoder requires @k-l-lambda/lotus which has Node.js-only dependencies
-	// The lotus parser uses jison at runtime and doesn't have a browser-compatible build
-	return { success: false, error: 'LilyPond import is not available in browser. Please use MusicXML format instead.' };
+export async function lilypondToLilylet(source: string): Promise<ConversionResult> {
+	try {
+		// lilypondDecoder requires the optional @k-l-lambda/lotus dependency
+		// Import directly from the pre-built file
+		let lilypondDecoder;
+		try {
+			lilypondDecoder = await import('@k-l-lambda/lilylet/lib/lilypondDecoder.js');
+		} catch {
+			return { success: false, error: 'LilyPond decoder not available (requires @k-l-lambda/lotus)' };
+		}
+		const doc = lilypondDecoder.decode(source);
+		const code = lilylet.serializeLilyletDoc(doc);
+		return { success: true, data: code };
+	} catch (error) {
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		console.error('LilyPond conversion error:', error);
+		return { success: false, error: `LilyPond conversion failed: ${errorMessage}` };
+	}
 }
 
 /**
