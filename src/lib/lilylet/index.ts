@@ -72,12 +72,14 @@ export function musicXmlToLilylet(xml: string): ConversionResult {
  * Convert LilyPond to Lilylet code
  * Note: lilypondDecoder requires optional @k-l-lambda/lotus dependency
  */
-export function lilypondToLilylet(source: string): ConversionResult {
+export async function lilypondToLilylet(source: string): Promise<ConversionResult> {
 	try {
-		// lilypondDecoder is not included in the main lilylet export
-		// It requires the optional @k-l-lambda/lotus dependency
-		const lilypondDecoder = (lilylet as any).lilypondDecoder;
-		if (!lilypondDecoder) {
+		// lilypondDecoder requires the optional @k-l-lambda/lotus dependency
+		// Import directly from the pre-built file
+		let lilypondDecoder;
+		try {
+			lilypondDecoder = await import('@k-l-lambda/lilylet/lib/lilypondDecoder.js');
+		} catch {
 			return { success: false, error: 'LilyPond decoder not available (requires @k-l-lambda/lotus)' };
 		}
 		const doc = lilypondDecoder.decode(source);
