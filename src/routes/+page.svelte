@@ -163,7 +163,7 @@
 			editorStore.addLog('info', `Converting ${file.name}...`);
 
 			if (isLilypond) {
-				const result = lilypondToLilylet(content);
+				const result = await lilypondToLilylet(content);
 				if (result.success) {
 					editorStore.setCode(result.data);
 					editorStore.addLog('info', `Successfully converted ${file.name} to Lilylet`);
