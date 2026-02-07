@@ -26,32 +26,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Checkout music-widgets dependency
-        uses: actions/checkout@v4
-        with:
-          repository: k-l-lambda/web-widgets
-          path: music-widgets
-
-      - name: Build music-widgets
-        run: |
-          cd music-widgets
-          npm install --legacy-peer-deps
-          npm run build
-          # Copy UMD bundle to static folder for direct script loading
-          mkdir -p ../static/js
-          cp dist/musicWidgetsBrowser.umd.js ../static/js/musicWidgetsBrowser.umd.min.js
-
-      - name: Update package.json dependencies
-        run: |
-          # Remove music-widgets from dependencies since we load it via UMD script
-          sed -i '/"@k-l-lambda\/music-widgets"/d' package.json
-          # Remove lotus from dependencies (optional, requires GitHub Packages auth)
-          sed -i '/"@k-l-lambda\/lotus"/d' package.json
-          # Remove package-lock.json since dependency paths change
-          rm -f package-lock.json
-
       - name: Install dependencies
-        run: npm install
+        run: |
+          # CI uses npmjs.org (all @k-l-lambda packages published there too)
+          echo '@k-l-lambda:registry=https://registry.npmjs.org' > .npmrc
+          npm install
 
       - name: Build docs
         run: npm run build:docs
