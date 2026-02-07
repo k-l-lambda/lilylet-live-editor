@@ -31,7 +31,7 @@ jobs:
           # CI uses npmjs.org (all @k-l-lambda packages published there too, no auth needed)
           echo '@k-l-lambda:registry=https://registry.npmjs.org' > .npmrc
           rm -f package-lock.json
-          npm install
+          npm install --no-optional
 
       - name: Build docs
         run: npm run build:docs
