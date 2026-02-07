@@ -128,4 +128,19 @@ export function lilyletToMusicXml(code: string): ConversionResult {
 	}
 }
 
+/**
+ * Convert ABC notation to Lilylet code
+ */
+export function abcToLilylet(abc: string): ConversionResult {
+	try {
+		const doc = lilylet.abcDecoder.decode(abc);
+		const code = lilylet.serializeLilyletDoc(doc);
+		return { success: true, data: code };
+	} catch (error) {
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		console.error('ABC conversion error:', error);
+		return { success: false, error: `ABC conversion failed: ${errorMessage}` };
+	}
+}
+
 export { lilylet } from './highlight';

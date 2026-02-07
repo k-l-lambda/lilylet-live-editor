@@ -5,7 +5,7 @@
 	import Editor from '$lib/components/Editor.svelte';
 	import Preview from '$lib/components/Preview.svelte';
 	import { editorStore } from '$lib/stores/editor';
-	import { lilyletToMEI, musicXmlToLilylet, lilypondToLilylet } from '$lib/lilylet';
+	import { lilyletToMEI, musicXmlToLilylet, lilypondToLilylet, abcToLilylet } from '$lib/lilylet';
 	import { getStateFromUrl, copyShareUrl } from '$lib/utils/share';
 	import { initVerovio, getToolkit } from '$lib/verovio/toolkit';
 
@@ -152,9 +152,10 @@
 		const isLilypond = fileName.endsWith('.ly') || fileName.endsWith('.ily');
 		const isMusicXml = fileName.endsWith('.musicxml') || fileName.endsWith('.mxl') ||
 			(fileName.endsWith('.xml') && !fileName.endsWith('.mei.xml'));
+		const isAbc = fileName.endsWith('.abc');
 
-		if (!isLilypond && !isMusicXml) {
-			editorStore.addLog('warning', `Unsupported file type: ${file.name}. Supported formats: .ly, .musicxml, .xml`);
+		if (!isLilypond && !isMusicXml && !isAbc) {
+			editorStore.addLog('warning', `Unsupported file type: ${file.name}. Supported formats: .ly, .musicxml, .xml, .abc`);
 			return;
 		}
 
@@ -172,6 +173,14 @@
 				}
 			} else if (isMusicXml) {
 				const result = musicXmlToLilylet(content);
+				if (result.success) {
+					editorStore.setCode(result.data);
+					editorStore.addLog('info', `Successfully converted ${file.name} to Lilylet`);
+				} else {
+					editorStore.addLog('error', result.error);
+				}
+			} else if (isAbc) {
+				const result = abcToLilylet(content);
 				if (result.success) {
 					editorStore.setCode(result.data);
 					editorStore.addLog('info', `Successfully converted ${file.name} to Lilylet`);
@@ -284,7 +293,7 @@
 		{#if isDragOver}
 			<div class="drop-overlay">
 				<div class="drop-message">
-					Drop LilyPond (.ly) or MusicXML (.musicxml, .xml) file to convert
+					Drop LilyPond (.ly), MusicXML (.musicxml, .xml), or ABC (.abc) file to convert
 				</div>
 			</div>
 		{/if}

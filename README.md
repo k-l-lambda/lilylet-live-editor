@@ -14,6 +14,7 @@ A web-based editor for [Lilylet](https://github.com/k-l-lambda/lilylet) music no
 - Real-time music notation rendering via [Verovio](https://www.verovio.org/)
 - Syntax highlighting with CodeMirror
 - Shareable URLs with compressed code
+- Drag-and-drop file import: LilyPond (`.ly`), MusicXML (`.musicxml`, `.xml`), and ABC notation (`.abc`)
 
 ### Markdown Editor
 - Embed Lilylet code blocks in Markdown documents

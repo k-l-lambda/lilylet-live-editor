@@ -583,6 +583,42 @@ c8[ d e] f[ g a] | b[ c d] e4.
 
 **Note**: As in LilyPond, `(` `)` `[` `]` are postfixes on musical events, not scope delimiters.
 
+### Auto-Beam
+
+By default, Lilylet automatically groups eighth notes and shorter into beams following standard engraving rules (e.g., beam by beat in 4/4, by dotted-quarter groups in 6/8). This means you often don't need manual `[`/`]` at all—notes will be beamed correctly for the current time signature.
+
+Auto-beam activates automatically when no manual beam marks exist in the score. If you add any `[`/`]` marks, auto-beam is disabled to respect your explicit beaming.
+
+You can control this behavior with the `[auto-beam]` metadata header:
+
+| Setting | Effect |
+|---------|--------|
+| `[auto-beam "auto"]` | Default. Auto-beam if no manual beams exist |
+| `[auto-beam "on"]` | Always auto-beam (even if manual beams exist) |
+| `[auto-beam "off"]` | Never auto-beam; only use manual `[`/`]` beams |
+
+```lilylet
+[auto-beam "auto"]
+\time 4/4 \clef "treble"
+c8 d e f g a b c
+```
+
+Force auto-beam on alongside manual beams:
+
+```lilylet
+[auto-beam "on"]
+\time 6/8 \clef "treble"
+c8[ d e] f g a
+```
+
+Disable auto-beam entirely:
+
+```lilylet
+[auto-beam "off"]
+\time 4/4 \clef "treble"
+c8 d e f g a b c
+```
+
 ---
 
 ## Ornaments
@@ -762,6 +798,20 @@ c4 e g | c2.
 ```lilylet
 \time 4/4
 c''4 d e f | \ottava #1 g a b c | b a g f | \ottava #0 e d c2
+```
+
+### Navigation marks
+
+Use `\segno` and `\coda` to add navigation symbols to your score:
+
+| Notation | Symbol | Meaning |
+|----------|--------|---------|
+| `\segno` | 𝄋 | Segno (repeat from here) |
+| `\coda` | 𝄌 | Coda (jump to ending) |
+
+```lilylet
+\time 4/4 \clef "treble"
+c4\segno d e f | g a b c | d e f g\coda | a b c d
 ```
 
 ### Pedal markings

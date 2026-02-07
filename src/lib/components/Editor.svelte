@@ -23,7 +23,8 @@
 		const lower = fileName.toLowerCase();
 		return lower.endsWith('.ly') || lower.endsWith('.ily') ||
 			lower.endsWith('.musicxml') || lower.endsWith('.mxl') ||
-			(lower.endsWith('.xml') && !lower.endsWith('.mei.xml'));
+			(lower.endsWith('.xml') && !lower.endsWith('.mei.xml')) ||
+			lower.endsWith('.abc');
 	}
 
 	// Extension to intercept drop events for music files
