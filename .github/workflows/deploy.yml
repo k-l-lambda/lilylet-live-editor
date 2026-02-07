@@ -28,8 +28,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # CI uses npmjs.org (all @k-l-lambda packages published there too)
+          # CI uses npmjs.org (all @k-l-lambda packages published there too, no auth needed)
           echo '@k-l-lambda:registry=https://registry.npmjs.org' > .npmrc
+          rm -f package-lock.json
           npm install
 
       - name: Build docs
