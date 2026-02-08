@@ -21,7 +21,8 @@
 	// Check if a file is a supported music file
 	function isMusicFile(fileName: string): boolean {
 		const lower = fileName.toLowerCase();
-		return lower.endsWith('.ly') || lower.endsWith('.ily') ||
+		return lower.endsWith('.lyl') ||
+			lower.endsWith('.ly') || lower.endsWith('.ily') ||
 			lower.endsWith('.musicxml') || lower.endsWith('.mxl') ||
 			(lower.endsWith('.xml') && !lower.endsWith('.mei.xml')) ||
 			lower.endsWith('.abc');

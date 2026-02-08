@@ -149,18 +149,26 @@
 		const fileName = file.name.toLowerCase();
 
 		// Check file type by extension
+		const isLilylet = fileName.endsWith('.lyl');
 		const isLilypond = fileName.endsWith('.ly') || fileName.endsWith('.ily');
 		const isMusicXml = fileName.endsWith('.musicxml') || fileName.endsWith('.mxl') ||
 			(fileName.endsWith('.xml') && !fileName.endsWith('.mei.xml'));
 		const isAbc = fileName.endsWith('.abc');
 
-		if (!isLilypond && !isMusicXml && !isAbc) {
-			editorStore.addLog('warning', `Unsupported file type: ${file.name}. Supported formats: .ly, .musicxml, .xml, .abc`);
+		if (!isLilylet && !isLilypond && !isMusicXml && !isAbc) {
+			editorStore.addLog('warning', `Unsupported file type: ${file.name}. Supported formats: .lyl, .ly, .musicxml, .xml, .abc`);
 			return;
 		}
 
 		try {
 			const content = await file.text();
+
+			if (isLilylet) {
+				editorStore.setCode(content);
+				editorStore.addLog('info', `Loaded ${file.name}`);
+				return;
+			}
+
 			editorStore.addLog('info', `Converting ${file.name}...`);
 
 			if (isLilypond) {
@@ -293,7 +301,7 @@
 		{#if isDragOver}
 			<div class="drop-overlay">
 				<div class="drop-message">
-					Drop LilyPond (.ly), MusicXML (.musicxml, .xml), or ABC (.abc) file to convert
+					Drop Lilylet (.lyl), LilyPond (.ly), MusicXML (.musicxml, .xml), or ABC (.abc) file
 				</div>
 			</div>
 		{/if}
