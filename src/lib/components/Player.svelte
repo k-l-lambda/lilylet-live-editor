@@ -40,6 +40,8 @@
 	let audioLoadError: string | null = null;
 	let highlightedNotes: Set<string> = new Set();
 
+	let handledSeekRequestId = 0;
+
 	// Element cache for performance
 	let elementCache: Map<string, Element | null> = new Map();
 
@@ -378,6 +380,11 @@
 
 	$: if ($editorStore.mei && isAudioLoaded) {
 		initPlayer();
+	}
+
+	$: if ($editorStore.seekRequest && $editorStore.seekRequest.id !== handledSeekRequestId) {
+		handledSeekRequestId = $editorStore.seekRequest.id;
+		seekTo($editorStore.seekRequest.time);
 	}
 
 	onDestroy(() => {

@@ -4,6 +4,7 @@
 	import Player from './Player.svelte';
 	import { tick } from 'svelte';
 	import { lilyletToLilyPond, lilyletToMusicXml } from '$lib/lilylet';
+	import { getToolkit } from '$lib/verovio/toolkit';
 
 	let svgContainer: HTMLDivElement;
 	let previewContainer: HTMLDivElement;
@@ -204,6 +205,22 @@
 		}
 	}
 
+	function handleScoreClick(event: MouseEvent) {
+		const toolkit = getToolkit();
+		if (!toolkit || !svgContainer) return;
+
+		const target = event.target instanceof Element
+			? event.target.closest('.note, .chord, .rest, .mRest, .mSpace')
+			: null;
+		if (!target || !svgContainer.contains(target)) return;
+
+		const id = target.id;
+		if (!id) return;
+
+		const time = toolkit.getTimeForElement(id);
+		editorStore.requestSeek(time);
+	}
+
 	function handleContainerScroll() {
 		if (performance.now() > autoScrollUntil) {
 			lastUserScrollTime = performance.now();
@@ -295,7 +312,7 @@
 			</div>
 		{:else if $editorStore.svg}
 			<div class="svg-wrapper">
-				<div class="svg-container" bind:this={svgContainer}></div>
+				<div class="svg-container" bind:this={svgContainer} on:click={handleScoreClick}></div>
 				<div class="playback-cursor" bind:this={cursorElement} style={cursorStyle}></div>
 			</div>
 		{:else}

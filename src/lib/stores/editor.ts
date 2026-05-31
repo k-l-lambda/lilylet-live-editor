@@ -9,6 +9,11 @@ export interface LogEntry {
 	message: string;
 }
 
+export interface SeekRequest {
+	time: number;
+	id: number;
+}
+
 export interface EditorState {
 	code: string;
 	error: string | null;
@@ -18,6 +23,7 @@ export interface EditorState {
 	isRendering: boolean;
 	verovioReady: boolean;
 	cursorElementId: string | null;
+	seekRequest: SeekRequest | null;
 	previewWidth: number;
 	logs: LogEntry[];
 	logsExpanded: boolean;
@@ -55,6 +61,8 @@ function saveCode(code: string): void {
 	}
 }
 
+let nextSeekRequestId = 1;
+
 const initialState: EditorState = {
 	code: defaultCode, // Will be updated in browser
 	error: null,
@@ -64,6 +72,7 @@ const initialState: EditorState = {
 	isRendering: false,
 	verovioReady: false,
 	cursorElementId: null,
+	seekRequest: null,
 	previewWidth: 800,
 	logs: [],
 	logsExpanded: false
@@ -93,6 +102,7 @@ function createEditorStore() {
 		setRendering: (isRendering: boolean) => update((s) => ({ ...s, isRendering })),
 		setVerovioReady: (verovioReady: boolean) => update((s) => ({ ...s, verovioReady })),
 		setCursorElement: (cursorElementId: string | null) => update((s) => ({ ...s, cursorElementId })),
+		requestSeek: (time: number) => update((s) => ({ ...s, seekRequest: { time, id: nextSeekRequestId++ } })),
 		setPreviewWidth: (previewWidth: number) => update((s) => ({ ...s, previewWidth })),
 		addLog: (level: LogEntry['level'], message: string) => update((s) => {
 			const newLog: LogEntry = { timestamp: new Date(), level, message };
