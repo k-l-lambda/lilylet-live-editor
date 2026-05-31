@@ -12,6 +12,13 @@
 	let lastRenderedSvg = '';
 	let resizeObserver: ResizeObserver | null = null;
 	let exportMenuOpen = false;
+	let lastAutoScrollTime = 0;
+	let lastUserScrollTime = 0;
+	let autoScrollUntil = 0;
+
+	const AUTO_SCROLL_THROTTLE_MS = 350;
+	const USER_SCROLL_PAUSE_MS = 2500;
+	const AUTO_SCROLL_MARGIN = 96;
 
 	/**
 	 * Safely inject SVG content using DOMParser.
@@ -87,6 +94,33 @@
 		}
 
 		cursorStyle = `left: ${x}px; top: ${top}px; height: ${height}px; display: block;`;
+		scrollCursorIntoView(noteElement);
+	}
+
+	function scrollCursorIntoView(element: Element) {
+		if (!previewContainer) return;
+
+		const now = performance.now();
+		if (now - lastAutoScrollTime < AUTO_SCROLL_THROTTLE_MS) return;
+		if (now - lastUserScrollTime < USER_SCROLL_PAUSE_MS) return;
+
+		const containerRect = previewContainer.getBoundingClientRect();
+		const elementRect = element.getBoundingClientRect();
+		const above = elementRect.top < containerRect.top + AUTO_SCROLL_MARGIN;
+		const below = elementRect.bottom > containerRect.bottom - AUTO_SCROLL_MARGIN;
+
+		if (!above && !below) return;
+
+		lastAutoScrollTime = now;
+		autoScrollUntil = now + 500;
+		const targetTop = previewContainer.scrollTop
+			+ (elementRect.top - containerRect.top)
+			- previewContainer.clientHeight * 0.35;
+
+		previewContainer.scrollTo({
+			top: Math.max(0, targetTop),
+			behavior: 'smooth'
+		});
 	}
 
 	function downloadFile(content: string, filename: string, mimeType: string) {
@@ -170,6 +204,12 @@
 		}
 	}
 
+	function handleContainerScroll() {
+		if (performance.now() > autoScrollUntil) {
+			lastUserScrollTime = performance.now();
+		}
+	}
+
 	onMount(() => {
 		if (previewContainer) {
 			// Set initial width
@@ -238,7 +278,7 @@
 		</div>
 	</div>
 
-	<div class="preview-container" bind:this={previewContainer}>
+	<div class="preview-container" bind:this={previewContainer} on:scroll={handleContainerScroll}>
 		{#if !$editorStore.verovioReady}
 			<div class="loading-container">
 				<div class="loading-spinner">
