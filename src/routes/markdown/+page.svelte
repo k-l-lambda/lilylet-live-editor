@@ -138,6 +138,9 @@ console.log('Hello, Lilylet!');
 				api: 'webaudio'
 			});
 			isAudioLoaded = true;
+			// warm up the AudioContext eagerly so later plays are already hot (the
+			// in-gesture warmup in playBlock is what actually satisfies autoplay policy)
+			try { await MidiAudio?.WebAudio?.awaitWarmup?.(); } catch (e) {}
 		} catch (error) {
 			console.error('Failed to load MidiAudio:', error);
 		}
@@ -285,9 +288,13 @@ console.log('Hello, Lilylet!');
 		}
 	}
 
-	function playBlock(blockId: string) {
+	async function playBlock(blockId: string) {
 		const player = blockPlayers.get(blockId);
 		if (!player || !player.midiData || player.isPlaying) return;
+
+		// warm up the AudioContext (browser autoplay policy) inside the play gesture
+		// before scheduling notes, so the opening notes aren't dropped on first play
+		try { await MidiAudio?.WebAudio?.awaitWarmup?.(); } catch (e) {}
 
 		player.isPlaying = true;
 		playingBlockId = blockId;

@@ -37,5 +37,10 @@ declare module '@k-l-lambda/music-widgets/dist/musicWidgetsBrowser.es.js' {
 		noteOff(channel: number, note: number | undefined, timestamp: number): void;
 		programChange(channel: number, program: number | undefined): void;
 		stopAllNotes?: () => void;
+		WebAudio?: {
+			needsWarmup?: () => boolean;
+			awaitWarmup?: () => Promise<void>;
+			getContextState?: () => string | null;
+		};
 	};
 }
