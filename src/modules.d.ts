@@ -6,6 +6,7 @@ declare module 'verovio' {
 		renderToSVG(page: number): string;
 		renderToMIDI(): string;
 		getElementsAtTime(millisec: number): { notes: string[]; page: number };
+		getTimeForElement(id: string): number;
 		setOptions(options: any): void;
 		getVersion(): string;
 	}
@@ -25,6 +26,7 @@ declare module 'verovio/esm' {
 		renderToSVG(page: number): string;
 		renderToMIDI(): string;
 		getElementsAtTime(millisec: number): { notes: string[]; page: number };
+		getTimeForElement(id: string): number;
 		setOptions(options: any): void;
 		getVersion(): string;
 	}
