@@ -38,6 +38,7 @@
 		"@k-l-lambda/music-widgets": "1.0.7",
 		"codemirror": "^6.0.0",
 		"js-base64": "^3.7.0",
+		"js-synthesizer": "^1.11.0",
 		"lodash": "^4.17.23",
 		"markdown-it": "^14.1.0",
 		"pako": "^2.1.0",

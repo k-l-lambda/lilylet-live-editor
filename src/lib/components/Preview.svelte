@@ -251,6 +251,18 @@
 <div class="preview-wrapper">
 	<div class="preview-header">
 		<span class="title">Preview</span>
+		{#if $editorStore.soundfontLoading || $editorStore.soundfontReady}
+			<!-- Sound-library status: grayscaled + dim + pulsing while the GM
+			     soundfont loads (piano fallback active), full-color steady
+			     piano once ready. -->
+			<span
+				class="sf-status"
+				class:ready={$editorStore.soundfontReady}
+				title={$editorStore.soundfontReady
+					? 'Sound library ready'
+					: 'Loading sound library… (piano fallback active)'}
+			>🎹</span>
+		{/if}
 		{#if $editorStore.isRendering}
 			<span class="rendering">Rendering...</span>
 		{/if}
@@ -349,6 +361,26 @@
 		color: #cccccc;
 		font-size: 14px;
 		font-weight: 500;
+	}
+
+	.sf-status {
+		font-size: 11px;
+		line-height: 1;
+		margin-left: 6px;
+		cursor: help;
+		user-select: none;
+		/* Loading: desaturate the piano to gray, dimmed and pulsing. */
+		filter: grayscale(1) brightness(1.15);
+		opacity: 0.5;
+		transition: filter 0.4s ease, opacity 0.4s ease;
+		animation: pulse 1.4s ease-in-out infinite;
+	}
+
+	.sf-status.ready {
+		/* Ready: full-color piano, steady. */
+		filter: none;
+		opacity: 1;
+		animation: none;
 	}
 
 	.rendering {

@@ -27,6 +27,11 @@ export interface EditorState {
 	previewWidth: number;
 	logs: LogEntry[];
 	logsExpanded: boolean;
+	// Audio backend status. soundfontLoading: the FluidSynth GM soundfont is
+	// still downloading/decoding (piano fallback active). soundfontReady: the
+	// full GM soundfont is loaded. Both false before the player mounts.
+	soundfontLoading: boolean;
+	soundfontReady: boolean;
 }
 
 // Sample Lilylet code demonstrating basic syntax
@@ -75,7 +80,9 @@ const initialState: EditorState = {
 	seekRequest: null,
 	previewWidth: 800,
 	logs: [],
-	logsExpanded: false
+	logsExpanded: false,
+	soundfontLoading: false,
+	soundfontReady: false
 };
 
 function createEditorStore() {
@@ -104,6 +111,8 @@ function createEditorStore() {
 		setCursorElement: (cursorElementId: string | null) => update((s) => ({ ...s, cursorElementId })),
 		requestSeek: (time: number) => update((s) => ({ ...s, seekRequest: { time, id: nextSeekRequestId++ } })),
 		setPreviewWidth: (previewWidth: number) => update((s) => ({ ...s, previewWidth })),
+		setSoundfontStatus: (soundfontLoading: boolean, soundfontReady: boolean) =>
+			update((s) => ({ ...s, soundfontLoading, soundfontReady })),
 		addLog: (level: LogEntry['level'], message: string) => update((s) => {
 			const newLog: LogEntry = { timestamp: new Date(), level, message };
 			const newLogs = [...s.logs, newLog].slice(-100); // Keep last 100 logs

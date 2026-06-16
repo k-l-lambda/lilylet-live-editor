@@ -9,6 +9,9 @@
 	let MIDI: any;
 	let MidiPlayer: any;
 	let MusicNotation: any;
+	// FluidSynth-backed audio adapter (full GM soundfont), with the legacy
+	// music-widgets WebAudio player injected as a piano fallback while the large
+	// soundfont loads. Imported dynamically in onMount to stay browser-only.
 	let MidiAudio: any;
 
 	// Types for MIDI data structures
@@ -88,17 +91,37 @@
 			MIDI = musicWidgets.MIDI;
 			MidiPlayer = musicWidgets.MidiPlayer;
 			MusicNotation = musicWidgets.MusicNotation;
-			MidiAudio = musicWidgets.MidiAudio;
 
-			await MidiAudio.loadPlugin({
-				soundfontUrl: `${base}/soundfont/`,
-				api: 'webaudio'
-			});
+			// FluidSynth adapter (npm import, bundled by Vite). Inject the legacy
+			// UMD MidiAudio as the piano fallback and the SvelteKit base path for
+			// static asset URLs (fluid runtime + soundfont).
+			const fluidAudio = (await import('$lib/audio/fluidAudio')).default;
+			fluidAudio.init(musicWidgets.MidiAudio, base);
+			MidiAudio = fluidAudio;
+
+			// loadPlugin resolves once the FluidSynth soundfont is fully decoded.
+			// The legacy piano fallback becomes audible earlier (inside loadPlugin),
+			// so allow playback as soon as any backend can sound.
+			editorStore.setSoundfontStatus(true, false);
+			const ready = MidiAudio.loadPlugin();
+			// Poll for the fallback so the play button enables without waiting for
+			// the full ~40 MB soundfont.
+			const enableWhenAudible = setInterval(() => {
+				if (!MidiAudio.empty()) {
+					isAudioLoaded = true;
+					clearInterval(enableWhenAudible);
+				}
+			}, 100);
+
+			await ready;
+			clearInterval(enableWhenAudible);
 			isAudioLoaded = true;
+			editorStore.setSoundfontStatus(false, true);
 			audioLoadError = null;
 		} catch (error) {
 			console.error('Failed to load MidiAudio:', error);
 			audioLoadError = error instanceof Error ? error.message : 'Failed to load audio';
+			editorStore.setSoundfontStatus(false, false);
 		}
 	});
 
@@ -192,6 +215,8 @@
 
 	function play() {
 		if (!midiPlayer || !midiData || isPlaying) return;
+		// Resume the AudioContext from this user gesture (autoplay policy).
+		MidiAudio.resume?.();
 		isPlaying = true;
 
 		// Resume from pausedTime if we were paused, otherwise start from 0
@@ -417,8 +442,6 @@
 		</button>
 		{#if audioLoadError}
 			<span class="error-text" title={audioLoadError}>Audio error</span>
-		{:else if !isAudioLoaded}
-			<span class="loading-text">Loading audio...</span>
 		{/if}
 	</div>
 
@@ -483,12 +506,6 @@
 
 	.stop-btn:hover:not(:disabled) {
 		color: #f48771;
-	}
-
-	.loading-text {
-		color: #858585;
-		font-size: 11px;
-		margin-left: 8px;
 	}
 
 	.error-text {
