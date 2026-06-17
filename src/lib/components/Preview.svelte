@@ -21,6 +21,19 @@
 	const USER_SCROLL_PAUSE_MS = 2500;
 	const AUTO_SCROLL_MARGIN = 96;
 
+	// Sound-library status icon: once the GM soundfont finishes loading, show a
+	// green ✓ for 2s then fade it out (it stays revealed on hover). Tracks the
+	// loading→ready transition so the fade timer fires exactly once.
+	let sfReadyShown = false;	// icon is in the post-load "ready" presentation
+	let sfFaded = false;		// 2s elapsed → fade out (hover still reveals)
+	let sfFadeTimer: ReturnType<typeof setTimeout> | null = null;
+
+	$: if ($editorStore.soundfontReady && !sfReadyShown) {
+		sfReadyShown = true;
+		if (sfFadeTimer) clearTimeout(sfFadeTimer);
+		sfFadeTimer = setTimeout(() => (sfFaded = true), 2000);
+	}
+
 	/**
 	 * Safely inject SVG content using DOMParser.
 	 * This extracts only the SVG element from the content, avoiding potential XSS vectors.
@@ -245,6 +258,7 @@
 			resizeObserver.disconnect();
 			resizeObserver = null;
 		}
+		if (sfFadeTimer) clearTimeout(sfFadeTimer);
 	});
 </script>
 
@@ -252,16 +266,18 @@
 	<div class="preview-header">
 		<span class="title">Preview</span>
 		{#if $editorStore.soundfontLoading || $editorStore.soundfontReady}
-			<!-- Sound-library status: grayscaled + dim + pulsing while the GM
-			     soundfont loads (piano fallback active), full-color steady
-			     piano once ready. -->
+			<!-- Sound-library status. While the GM soundfont loads: grayscaled + dim
+			     + pulsing piano (the small grand-piano soundfont is the audible
+			     fallback). Once ready: green piano with a ✓, shown for 2s then faded
+			     out — hover re-reveals it with a tooltip. -->
 			<span
 				class="sf-status"
 				class:ready={$editorStore.soundfontReady}
+				class:faded={sfFaded}
 				title={$editorStore.soundfontReady
-					? 'Sound library ready'
-					: 'Loading sound library… (piano fallback active)'}
-			>🎹</span>
+					? 'Sound library ready — full instrument timbres'
+					: 'Loading sound library… (grand-piano fallback active)'}
+			>🎹{#if $editorStore.soundfontReady}<span class="sf-check">✓</span>{/if}</span>
 		{/if}
 		{#if $editorStore.isRendering}
 			<span class="rendering">Rendering...</span>
@@ -364,6 +380,7 @@
 	}
 
 	.sf-status {
+		position: relative;
 		font-size: 11px;
 		line-height: 1;
 		margin-left: 6px;
@@ -381,6 +398,28 @@
 		filter: none;
 		opacity: 1;
 		animation: none;
+	}
+
+	.sf-status.ready.faded {
+		/* 2s after ready: fade out slowly; hover re-reveals it. */
+		opacity: 0;
+		transition: opacity 1.2s ease;
+	}
+
+	.sf-status.ready.faded:hover {
+		opacity: 1;
+		transition: opacity 0.2s ease;
+	}
+
+	/* Green ✓ badge superscript on the ready piano. */
+	.sf-check {
+		position: absolute;
+		top: -0.4em;
+		right: -0.7em;
+		font-size: 0.85em;
+		font-weight: 700;
+		color: #3fb950;
+		text-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
 	}
 
 	.rendering {
