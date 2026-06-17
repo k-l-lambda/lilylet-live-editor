@@ -1,179 +1,95 @@
-// Lilylet syntax highlighting for CodeMirror 6
-import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
-import { tags as t } from '@lezer/highlight';
-import { StreamLanguage } from '@codemirror/language';
+// Lilylet syntax highlighting for CodeMirror 6.
+//
+// Thin adapter: the language's token rules live in @k-l-lambda/lilylet/highlight
+// (generated from the grammar's lexer, framework-agnostic). Here we only map
+// the package's generic scopes onto CodeMirror/Lezer tags and a colour theme,
+// so the highlighter stays in lock-step with the grammar instead of drifting in
+// a hand-maintained copy.
+import { HighlightStyle, syntaxHighlighting, StreamLanguage } from '@codemirror/language';
+import { tags as t, type Tag } from '@lezer/highlight';
+import { matchAt, type HighlightScope } from '@k-l-lambda/lilylet/highlight';
 
-// Define the Lilylet language
-const lilyletLanguage = StreamLanguage.define({
+// Map each generic Lilylet scope to a Lezer highlight tag. Several scopes share
+// a tag where the palette below would colour them identically; keeping distinct
+// tags where the theme differentiates them (e.g. tuplet vs keyword).
+const SCOPE_TAG: Record<HighlightScope, Tag> = {
+	keyword: t.keyword,        // \clef \key \time \tempo \staff \ottava \repeat ...
+	tuplet: t.keyword,         // \times \tuplet
+	mode: t.typeName,          // \major \minor
+	grace: t.special(t.keyword), // \grace
+	markup: t.meta,            // \markup
+	stem: t.operator,          // \stemUp \stemDown \stemNeutral
+	header: t.meta,            // [title [composer ...
+	string: t.string,          // "..."
+	number: t.number,          // 4 8 16
+	pitch: t.variableName,     // c d e f g a b (+accidental)
+	octave: t.variableName,    // ' ,
+	rest: t.comment,           // r s R \rest
+	dynamic: t.labelName,      // \p \f \mf ...
+	hairpin: t.labelName,      // \< \> \!
+	articulation: t.labelName, // \staccato ... and -. -> etc
+	ornament: t.labelName,     // \trill \turn ...
+	pedal: t.labelName,        // \sustainOn \sustainOff
+	navigation: t.labelName,   // \coda \segno
+	tie: t.operator,           // ~
+	operator: t.operator,      // / : =
+	separator: t.separator,    // \\\\ \\\\\\ (part/voice)
+	bar: t.separator,          // |
+	comment: t.comment,        // % ...
+	chordBracket: t.bracket,   // < >
+	brace: t.brace,            // { }
+	squareBracket: t.squareBracket, // [ ]
+	paren: t.paren,            // ( )
+	punctuation: t.punctuation,// . - _ ^ ! #
+};
+
+// Stable, distinct token-name strings handed to CodeMirror's tokenTable. We use
+// the scope name itself as the token name, then resolve scope -> Tag below.
+const tokenTable: Record<string, Tag> = Object.fromEntries(
+	Object.entries(SCOPE_TAG)
+) as Record<string, Tag>;
+
+// CodeMirror StreamLanguage: at each position, ask the generated tokenizer for
+// the longest matching token and emit its scope as the token name.
+const lilyletLanguage = StreamLanguage.define<unknown>({
 	token(stream) {
-		// Skip whitespace
-		if (stream.eatSpace()) return null;
-
-		// Comments: % to end of line
-		if (stream.match('%')) {
-			stream.skipToEnd();
-			return 'comment';
+		const line = stream.string;
+		const tok = matchAt(line, stream.pos);
+		if (tok) {
+			stream.pos = tok.end;
+			return tok.scope;
 		}
-
-		// Bar line: |
-		if (stream.match('|')) {
-			return 'separator';
-		}
-
-		// Commands starting with backslash
-		if (stream.match(/^\\[a-zA-Z]+/)) {
-			const cmd = stream.current();
-			// Context commands
-			if (/^\\(key|time|clef|tempo|ottava|staff)$/.test(cmd)) {
-				return 'keyword';
-			}
-			// Mode commands
-			if (/^\\(major|minor)$/.test(cmd)) {
-				return 'typeName';
-			}
-			// Articulation and expressive commands
-			if (/^\\(trill|turn|mordent|prall|fermata|shortfermata|arpeggio)$/.test(cmd)) {
-				return 'labelName';
-			}
-			// Dynamic commands
-			if (/^\\(ppp|pp|p|mp|mf|f|ff|fff|sfz|rfz)$/.test(cmd)) {
-				return 'labelName';
-			}
-			// Hairpin commands
-			if (/^\\(<|>|!)$/.test(cmd)) {
-				return 'labelName';
-			}
-			// Stem direction
-			if (/^\\(stemUp|stemDown|stemNeutral)$/.test(cmd)) {
-				return 'operator';
-			}
-			// Tuplet
-			if (/^\\times$/.test(cmd)) {
-				return 'keyword';
-			}
-			// Repeat/tremolo
-			if (/^\\repeat$/.test(cmd)) {
-				return 'keyword';
-			}
-			// Grace note
-			if (/^\\grace$/.test(cmd)) {
-				return 'special';
-			}
-			// Rest marker
-			if (/^\\rest$/.test(cmd)) {
-				return 'comment';
-			}
-			// Pedal
-			if (/^\\(sustainOn|sustainOff|sostenutoOn|sostenutoOff|unaCorda|treCorde)$/.test(cmd)) {
-				return 'labelName';
-			}
-			// Other commands
-			return 'meta';
-		}
-
-		// Chord: < ... >
-		if (stream.match('<')) {
-			return 'bracket';
-		}
-		if (stream.match('>')) {
-			return 'bracket';
-		}
-
-		// Tuplet braces
-		if (stream.match('{')) {
-			return 'brace';
-		}
-		if (stream.match('}')) {
-			return 'brace';
-		}
-
-		// Quoted strings (for clef names, titles, etc.)
-		if (stream.match(/"[^"]*"/)) {
-			return 'string';
-		}
-
-		// Numbers (for time signature, duration, etc.)
-		if (stream.match(/^\d+/)) {
-			return 'number';
-		}
-
-		// Tie ~
-		if (stream.match('~')) {
-			return 'operator';
-		}
-
-		// Slur ( )
-		if (stream.match('(') || stream.match(')')) {
-			return 'paren';
-		}
-
-		// Beam [ ]
-		if (stream.match('[') || stream.match(']')) {
-			return 'squareBracket';
-		}
-
-		// Articulation marks: -. -! -_ -^ ->
-		if (stream.match(/^[-_^][.!_^>]/)) {
-			return 'labelName';
-		}
-
-		// Pitch names with optional accidentals and octave marks
-		// Pitch: c, d, e, f, g, a, b followed by optional s/f/ss/ff/! and '/,
-		if (stream.match(/^[a-g](s|f|ss|ff|!)?[',]*/)) {
-			return 'variableName';
-		}
-
-		// Rest types: r, s, R (full measure)
-		if (stream.match(/^[rsR]/)) {
-			return 'comment';
-		}
-
-		// Dots after duration
-		if (stream.match('.')) {
-			return 'punctuation';
-		}
-
-		// Tremolo marker :
-		if (stream.match(':')) {
-			return 'operator';
-		}
-
-		// Fraction for tuplet ratio
-		if (stream.match('/')) {
-			return 'operator';
-		}
-
-		// Skip any other character
+		// No rule matched here — consume one char, emit nothing.
 		stream.next();
 		return null;
-	}
+	},
+	tokenTable,
 });
 
-// Custom highlight style for Lilylet
+// One Dark-flavoured palette (matches the previous hand-written highlighter).
 const lilyletHighlightStyle = HighlightStyle.define([
-	{ tag: t.keyword, color: '#c678dd', fontWeight: 'bold' },           // \key, \time, \clef
-	{ tag: t.typeName, color: '#56b6c2' },                               // \major, \minor
-	{ tag: t.separator, color: '#e06c75', fontWeight: 'bold' },         // |
-	{ tag: t.comment, color: '#5c6370', fontStyle: 'italic' },          // %, r, s, R
-	{ tag: t.string, color: '#98c379' },                                 // "..."
-	{ tag: t.number, color: '#d19a66' },                                 // 4, 8, 16
-	{ tag: t.variableName, color: '#e06c75', fontWeight: 'bold' },      // c, d, e, f, g, a, b
-	{ tag: t.bracket, color: '#61afef' },                                // < >
-	{ tag: t.brace, color: '#c678dd' },                                  // { }
-	{ tag: t.paren, color: '#98c379' },                                  // ( )
-	{ tag: t.squareBracket, color: '#61afef' },                          // [ ]
-	{ tag: t.operator, color: '#56b6c2' },                               // ~, :, /
-	{ tag: t.labelName, color: '#98c379' },                              // articulations, dynamics
-	{ tag: t.special(t.keyword), color: '#c678dd', fontStyle: 'italic' }, // \grace
-	{ tag: t.meta, color: '#abb2bf' },                                   // other commands
-	{ tag: t.punctuation, color: '#abb2bf' },                            // .
-	{ tag: t.invalid, color: '#e06c75', textDecoration: 'underline' }   // Unknown
+	{ tag: t.keyword, color: '#c678dd', fontWeight: 'bold' },
+	{ tag: t.typeName, color: '#56b6c2' },
+	{ tag: t.separator, color: '#e06c75', fontWeight: 'bold' },
+	{ tag: t.comment, color: '#5c6370', fontStyle: 'italic' },
+	{ tag: t.string, color: '#98c379' },
+	{ tag: t.number, color: '#d19a66' },
+	{ tag: t.variableName, color: '#e06c75', fontWeight: 'bold' },
+	{ tag: t.bracket, color: '#61afef' },
+	{ tag: t.brace, color: '#c678dd' },
+	{ tag: t.paren, color: '#98c379' },
+	{ tag: t.squareBracket, color: '#61afef' },
+	{ tag: t.operator, color: '#56b6c2' },
+	{ tag: t.labelName, color: '#98c379' },
+	{ tag: t.special(t.keyword), color: '#c678dd', fontStyle: 'italic' },
+	{ tag: t.meta, color: '#abb2bf' },
+	{ tag: t.punctuation, color: '#abb2bf' },
+	{ tag: t.invalid, color: '#e06c75', textDecoration: 'underline' },
 ]);
 
-// Export the language and highlighting
 export const lilylet = () => [
 	lilyletLanguage,
-	syntaxHighlighting(lilyletHighlightStyle)
+	syntaxHighlighting(lilyletHighlightStyle),
 ];
 
 export { lilyletLanguage, lilyletHighlightStyle };
