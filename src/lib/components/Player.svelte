@@ -24,6 +24,8 @@
 			noteNumber?: number;
 			velocity?: number;
 			programNumber?: number;
+			controllerType?: number;
+			value?: number;
 		};
 	}
 
@@ -169,6 +171,9 @@
 						case 'programChange':
 							MidiAudio.programChange(data.channel, data.programNumber);
 							break;
+						case 'controller':
+							MidiAudio.controlChange(data.channel, data.controllerType, data.value, timestamp);
+							break;
 					}
 				},
 				onPlayFinish: () => {
@@ -254,6 +259,9 @@
 							break;
 						case 'programChange':
 							MidiAudio.programChange(event.data.channel, event.data.programNumber);
+							break;
+						case 'controller':
+							MidiAudio.controlChange(event.data.channel, event.data.controllerType, event.data.value, timestamp);
 							break;
 					}
 				}

@@ -35,6 +35,7 @@ interface LegacyMidiAudioLike {
 	noteOn(channel: number, note: number, velocity: number, timestamp: number): void;
 	noteOff(channel: number, note: number, timestamp: number): void;
 	programChange(channel: number, program: number): void;
+	controlChange?(channel: number, control: number, value: number, timestamp: number): void;
 	stopAllNotes(): void;
 }
 
@@ -171,6 +172,20 @@ const programChange = (channel: number, program: number): void => {
 		legacy.programChange(channel, program);
 };
 
+// Forward a MIDI control-change event (sustain pedal CC64, volume CC7, pan CC10,
+// expression CC11, etc.) to FluidSynth, which honours them per-channel. Verovio
+// emits these from MEI <pedal>/dynamics, so e.g. sustain-pedal spans play back
+// correctly. The legacy MIDI.js fallback has no CC support, so CC is dropped
+// while it is the active backend (only during the brief soundfont load).
+const controlChange = (channel: number, control: number, value: number, timestamp: number): void => {
+	if (seq) {
+		seq.sendEventAt({ type: 'controlchange', channel, control, value }, delayFromNow(timestamp), false);
+		return;
+	}
+	if (legacyReady && legacy)
+		legacy.controlChange?.(channel, control, value, timestamp);
+};
+
 const stopAllNotes = (): void => {
 	if (seq)
 		seq.removeAllEvents(); // drop the in-flight look-ahead window
@@ -192,5 +207,6 @@ export default {
 	noteOn,
 	noteOff,
 	programChange,
+	controlChange,
 	stopAllNotes
 };
