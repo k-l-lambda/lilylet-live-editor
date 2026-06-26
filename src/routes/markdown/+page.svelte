@@ -4,7 +4,7 @@
 	import { base } from '$app/paths';
 	import MarkdownIt from 'markdown-it';
 	import lilyletPlugin from '@k-l-lambda/lilylet-markdown';
-	import { initVerovio, getToolkit } from '$lib/verovio/toolkit';
+	import { initVerovio, getToolkit, renderStackedSVG } from '$lib/verovio/toolkit';
 	import { lilyletToMEI } from '$lib/lilylet';
 
 	let markdownInput = `# Lilylet in Markdown Demo
@@ -518,7 +518,7 @@ console.log('Hello, Lilylet!');
 				const pageWidthUnits = Math.round(effectiveWidth * 2.5);
 				const basePageHeight = 2000;
 				const measuresPerPage = 20;
-				const pageHeight = Math.max(basePageHeight, Math.ceil(measureCount / measuresPerPage) * basePageHeight) * 2 * staffCount;
+				const pageHeight = Math.min(Math.max(basePageHeight, Math.ceil(measureCount / measuresPerPage) * basePageHeight) * 2 * staffCount, 60000);
 
 				toolkit.setOptions({
 					scale: 40,
@@ -529,7 +529,7 @@ console.log('Hello, Lilylet!');
 
 				const loaded = toolkit.loadData(mei);
 				if (loaded) {
-					const svg = toolkit.renderToSVG(1);
+					const svg = renderStackedSVG(toolkit);
 					// Preserve mini-player if it exists
 					const miniPlayer = el.querySelector('.mini-player');
 					el.innerHTML = svg;
@@ -593,7 +593,7 @@ console.log('Hello, Lilylet!');
 				const pageWidthUnits = Math.round(effectiveWidth * 2.5);
 				const basePageHeight = 2000;
 				const measuresPerPage = 20;
-				const pageHeight = Math.max(basePageHeight, Math.ceil(measureCount / measuresPerPage) * basePageHeight) * 2 * staffCount;
+				const pageHeight = Math.min(Math.max(basePageHeight, Math.ceil(measureCount / measuresPerPage) * basePageHeight) * 2 * staffCount, 60000);
 
 				toolkit.setOptions({
 					scale: 40,
@@ -604,7 +604,7 @@ console.log('Hello, Lilylet!');
 
 				const loaded = toolkit.loadData(mei);
 				if (loaded) {
-					const svg = toolkit.renderToSVG(1);
+					const svg = renderStackedSVG(toolkit);
 					el.innerHTML = svg;
 					el.removeAttribute('data-lilylet-pending');
 					el.setAttribute('data-lilylet', '');

@@ -7,7 +7,7 @@
 	import { editorStore } from '$lib/stores/editor';
 	import { lilyletToMEI, musicXmlToLilylet, lilypondToLilylet, abcToLilylet } from '$lib/lilylet';
 	import { getStateFromUrl, copyShareUrl } from '$lib/utils/share';
-	import { initVerovio, getToolkit } from '$lib/verovio/toolkit';
+	import { initVerovio, getToolkit, renderStackedSVG } from '$lib/verovio/toolkit';
 
 	let shareStatus: 'idle' | 'copied' | 'error' = 'idle';
 	let lastRenderedCode = '';
@@ -92,10 +92,16 @@
 			const pageWidthUnits = Math.round(effectiveWidth * 2.5);
 
 			// Calculate pageHeight based on measure count and staff count
-			// ~20 measures fit in one standard page (height ~2000 units at scale 40)
+			// ~20 measures fit in one standard page (height ~2000 units at scale 40).
+			// Verovio rejects pageHeight > 60000 (falls back to the 2970 default and
+			// splits into many small pages), so clamp to its max. We now render and
+			// stack ALL pages vertically (renderStackedSVG), so even when a long score
+			// paginates, every page is shown — the clamp just keeps pagination sane and
+			// avoids the out-of-bounds warning rather than trying to force one giant page.
 			const basePageHeight = 2000;
 			const measuresPerPage = 20;
-			const pageHeight = Math.max(basePageHeight, Math.ceil(measureCount / measuresPerPage) * basePageHeight) * 2 * staffCount;
+			const rawPageHeight = Math.max(basePageHeight, Math.ceil(measureCount / measuresPerPage) * basePageHeight) * 2 * staffCount;
+			const pageHeight = Math.min(rawPageHeight, 60000);
 
 			toolkit.setOptions({
 				scale: 40,
@@ -114,7 +120,7 @@
 			}
 
 			const pageCount = toolkit.getPageCount();
-			const svg = toolkit.renderToSVG(1);
+			const svg = renderStackedSVG(toolkit);
 
 			// Final check before committing results
 			if (renderId !== currentRenderId) return;
