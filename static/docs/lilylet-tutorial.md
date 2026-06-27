@@ -906,18 +906,18 @@ By default the layout is **index-wise**: each leaf is a 1-based measure number. 
 | `N*[body]{alt1, alt2}` | Volta: repeat `body`, taking a different ending each pass |
 | `<main, rest>` | ABA / da capo: play `main`, then `rest`, then `main` again |
 
-A simple two-pass volta — measures 1–4 repeat, with bar 5 as the first ending and bar 6 as the second (performed order `1 2 3 4 5 | 1 2 3 4 6`):
+A simple two-pass volta — measures 1–4 repeat, with bar 5 as the first ending and bar 6 as the second (performed order `1 2 3 4 5 | 1 2 3 4 6`). A repeat from the very top needs no opening barline; just close the repeated block with `\bar ":|."` and label the two endings:
 
 ```lilylet
 [measures "2*[1..4]{5,6}"]
-c1 | d1 | e1 | f1 | g1 | a1 |
+c1 | d1 | e1 | f1 | g1^ \bar ":|." | a1 |
 ```
 
-A da-capo (ABA) form — section A (1–4), section B (5–8), then A again (performed order `1 2 3 4 | 5 6 7 8 | 1 2 3 4`):
+A da-capo (ABA) form — section A (1–4), section B (5–8), then A again (performed order `1 2 3 4 | 5 6 7 8 | 1 2 3 4`). Annotate the turning points with `\markup`: put `Fine` with a final barline `\bar "|."` where the piece ends on the repeat, and `D.C. al Fine` (da capo al fine, "from the top until *Fine*") where it jumps back — that bar just flows on, so it takes no barline of its own:
 
 ```lilylet
 [measures "<[1,2,3,4],[5,6,7,8]>"]
-c1 | d1 | e1 | f1 | g1 | a1 | b1 | c1 |
+c1 | d1 | e1 | f1^\markup "Fine" \bar "|." | g1 | a1 | b1 | c1_\markup "D.C. al Fine" |
 ```
 
 A leading `s:` switches to **segment-wise** mode, where leaves are segment *lengths* instead of indices (e.g. `s: 2*[4]` repeats the first 4-bar segment) — handy when you think in phrase lengths rather than bar numbers.
