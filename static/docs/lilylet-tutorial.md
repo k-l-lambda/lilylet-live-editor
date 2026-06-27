@@ -910,7 +910,7 @@ A simple two-pass volta — measures 1–4 repeat, with bar 5 as the first endin
 
 ```lilylet
 [measures "2*[1..4]{5,6}"]
-c1 | d1 | e1 | f1 | g1^ \bar ":|." | a1 |
+c1 | d1 | e1 | f1 | g1 \bar ":|." | a1 |
 ```
 
 A da-capo (ABA) form — section A (1–4), section B (5–8), then A again (performed order `1 2 3 4 | 5 6 7 8 | 1 2 3 4`). Annotate the turning points with `\markup`: put `Fine` with a final barline `\bar "|."` where the piece ends on the repeat, and `D.C. al Fine` (da capo al fine, "from the top until *Fine*") where it jumps back — that bar just flows on, so it takes no barline of its own:
