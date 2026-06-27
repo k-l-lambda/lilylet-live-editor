@@ -775,6 +775,48 @@ Use `\\\` to separate different staves/parts:
 <c, g' c>1 | % 2
 ```
 
+### Staff groups: `[staves "..."]`
+
+`\staff "N"` assigns notes to a staff, but it does not say how those staves are *grouped* on the page (a piano grand staff with a brace, a string section with a bracket, etc.). The `[staves "..."]` header declares that grouping. Each leaf in the layout string is one staff, in order; brackets group them and the connector between two leaves sets the barline join:
+
+| Symbol | Meaning |
+|--------|---------|
+| `{ }` | Brace group (typical piano grand staff) |
+| `< >` | Bracket group (instrument family, e.g. strings) |
+| `[ ]` | Square-bracket group |
+| `,` | Blank join (staves not barline-connected) |
+| `-` | Solid join (barlines run through) |
+| `.` | Dashed join |
+
+Leaf names (`pl`, `va`, …) are optional ids you can reference from `[instrument-...]`; an empty slot is an anonymous staff numbered `1`, `2`, …
+
+```lilylet
+[staves "{pl-pr} <va-vc>"]
+\staff "1" \clef "treble" c1 \\
+\staff "2" \clef "bass" c,1 \\\
+\clef "C" e1 \\\
+\clef "bass" c,1 |
+```
+
+Here `{pl-pr}` braces the first two staves into a grand staff and `<va-vc>` brackets the next two — four staves in two groups.
+
+### Instrument names: `[instrument-<key> "Name" "Short"]`
+
+Attach an instrument label to a staff or a whole group. `<key>` is a staff id (or an id range like `pl-pr`) from the `[staves]` layout, so the name lands at the right level: a single id labels one staff, a range labels the group. The short name (second string) is optional and shows on later systems.
+
+```lilylet
+[staves "{pl-pr} <va-vc>"]
+[instrument-pl-pr "Piano"]
+[instrument-va "Viola" "Va."]
+[instrument-vc "Cello" "Vc."]
+\staff "1" \clef "treble" c1 \\
+\staff "2" \clef "bass" c,1 \\\
+\clef "C" e1 \\\
+\clef "bass" c,1 |
+```
+
+`[instrument-pl-pr "Piano"]` names the braced grand-staff group once, while `va` and `vc` get their own names plus abbreviations.
+
 ---
 
 ## Advanced Features
@@ -848,6 +890,37 @@ Put metadata at the top of a snippet. This works well in Markdown collections (h
 
 \key g \major \time 3/4 \clef "treble" \stemDown d'4(\p \stemUp g,8[ a b c] | \stemDown d4) \stemUp g, g
 ```
+
+### Repeat & performance order: `[measures "..."]`
+
+Repeat barlines (`\bar ":|."`) show *where* a repeat is, but `[measures "..."]` declares the actual *playback order* of measures — which bars are repeated, and in what sequence. It compiles to an MEI `<expansion>`, so the score still prints compactly while MIDI playback unfolds the repeats.
+
+By default the layout is **index-wise**: each leaf is a 1-based measure number. The building blocks are:
+
+| Construct | Meaning |
+|-----------|---------|
+| `N` | Play measure `N` |
+| `A..B` | Inclusive range, e.g. `1..8` |
+| `[ ... ]` | A block (grouping) |
+| `N*[body]` | Play `body` `N` times |
+| `N*[body]{alt1, alt2}` | Volta: repeat `body`, taking a different ending each pass |
+| `<main, rest>` | ABA / da capo: play `main`, then `rest`, then `main` again |
+
+A simple two-pass volta — measures 1–4 repeat, with bar 5 as the first ending and bar 6 as the second (performed order `1 2 3 4 5 | 1 2 3 4 6`):
+
+```lilylet
+[measures "2*[1..4]{5,6}"]
+c1 | d1 | e1 | f1 | g1 | a1 |
+```
+
+A da-capo (ABA) form — section A (1–4), section B (5–8), then A again (performed order `1 2 3 4 | 5 6 7 8 | 1 2 3 4`):
+
+```lilylet
+[measures "<[1,2,3,4],[5,6,7,8]>"]
+c1 | d1 | e1 | f1 | g1 | a1 | b1 | c1 |
+```
+
+A leading `s:` switches to **segment-wise** mode, where leaves are segment *lengths* instead of indices (e.g. `s: 2*[4]` repeats the first 4-bar segment) — handy when you think in phrase lengths rather than bar numbers.
 
 ---
 
