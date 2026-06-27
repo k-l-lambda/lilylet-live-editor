@@ -44,7 +44,7 @@
 		"markdown-it": "^14.1.0",
 		"pako": "^2.1.0",
 		"sha1": "^1.1.1",
-		"verovio": "^5.7.0",
+		"verovio": "^6.2.0",
 		"vue": "^3.4.0"
 	},
 	"optionalDependencies": {

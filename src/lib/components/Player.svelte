@@ -347,6 +347,15 @@
 		updateHighlights(time);
 	}
 
+	// When a score has repeats, verovio unfolds the MEI <expansion> for MIDI and
+	// the time-map, minting a fresh id with a "-rendN" suffix (N >= 2) for every
+	// note replayed on a later pass. The rendered SVG, however, only draws each
+	// notated note once (the un-suffixed id). So on the 2nd+ pass the time-map id
+	// has no element in the DOM and the cursor would vanish. Strip the suffix to
+	// map every replay back onto the single drawn note — the cursor re-walks the
+	// same bars on each pass.
+	const normalizeRepeatId = (id: string): string => id.replace(/-rend\d+$/, '');
+
 	function updateHighlights(time: number) {
 		const toolkit = getToolkit();
 		if (!toolkit) return;
@@ -354,7 +363,7 @@
 		try {
 			// Get elements at current time (time is in ms)
 			const result = toolkit.getElementsAtTime(time);
-			const newNotes = new Set<string>(result.notes || []);
+			const newNotes = new Set<string>((result.notes || []).map(normalizeRepeatId));
 
 			// Remove highlights from notes no longer playing
 			highlightedNotes.forEach(id => {
@@ -381,7 +390,7 @@
 			// Update cursor position - use the first note as cursor position
 			const noteIds = result.notes || [];
 			if (noteIds.length > 0) {
-				editorStore.setCursorElement(noteIds[0]);
+				editorStore.setCursorElement(normalizeRepeatId(noteIds[0]));
 			}
 		} catch (error) {
 			// Ignore errors during highlight update
